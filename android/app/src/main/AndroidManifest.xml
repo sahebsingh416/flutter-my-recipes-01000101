@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="flutter_my_recipes_01000101"
+        android:label="Flavr"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
