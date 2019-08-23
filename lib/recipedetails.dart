@@ -1,22 +1,21 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-void main() => runApp(Recipe());
-
-class Recipe extends StatefulWidget {
+class RecipeDetails extends StatefulWidget {
   @override
-  _RecipeState createState() => _RecipeState();
+  _RecipeDetailsState createState() => _RecipeDetailsState();
 }
 
-class _RecipeState extends State<Recipe> {
+class _RecipeDetailsState extends State<RecipeDetails> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
-            "Recipes",
+            "Recipes Details",
             style: TextStyle(
               color: Colors.black,
               fontSize: 25,
@@ -24,26 +23,24 @@ class _RecipeState extends State<Recipe> {
           ),
           backgroundColor: Colors.white,
         ),
-        body: SafeArea(
-          child: ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            itemCount: 6,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                  margin: EdgeInsets.all(10),
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: 150,
-                        width: double.infinity,
-                        child: Image.asset(
-                          "images/food.jpg",
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment(-0.9, 0.0),
+        body: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Stack(
+              alignment: Alignment(0.0, -1.0),
+              children: <Widget>[
+                Image.asset("images/food.jpg",),
+                new Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Icon(Icons.favorite,color: Colors.white,),
+                ),
+              ],
+            ),
+            Card(
+              child: Column(
+                children: <Widget>[
+                  Container(
                         margin: EdgeInsets.only(top: 10),
                         child: Text(
                           "Soup",
@@ -52,7 +49,6 @@ class _RecipeState extends State<Recipe> {
                         ),
                       ),
                       Container(
-                        alignment: Alignment(-0.9, 0.0),
                         margin: EdgeInsets.only(top: 10),
                         child: Text(
                           "Alfredo Sauce",
@@ -89,7 +85,7 @@ class _RecipeState extends State<Recipe> {
                             ]),
                             Row(children: <Widget>[
                               Padding(
-                                padding: EdgeInsets.only(left: 6, right: 4),
+                                padding: EdgeInsets.only(left: 8, right: 10),
                               ),
                               Container(
                                   width: 80,
@@ -97,7 +93,7 @@ class _RecipeState extends State<Recipe> {
                                     children: <Widget>[
                                       Icon(Icons.view_list,color: Colors.grey,),
                                       Padding(
-                                        padding: EdgeInsets.only(left: 4,right: 5),
+                                        padding: EdgeInsets.only(left: 6,right: 1),
                                       ),
                                       Text(
                                         "Easy",
@@ -135,10 +131,79 @@ class _RecipeState extends State<Recipe> {
                           ],
                         ),
                       ),
-                    ],
-                  ));
-            },
-          ),
+                ],
+              ),
+            ),
+            Card(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.black12,
+                    height: 30,
+                    padding: EdgeInsets.only(top: 5),
+                    width: double.maxFinite,
+                    child: Text("INGREDIENTS",style: TextStyle(fontSize: 15,letterSpacing: sqrt1_2),textAlign: TextAlign.center,),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                     children: <Widget>[
+                       ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 10,
+                      itemBuilder: (BuildContext context,int index){
+                        return ListTile(
+                          contentPadding: EdgeInsets.all(5),
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.orange,
+                            radius: 6.0,
+                          ),
+                          title: Text("Hello",textAlign: TextAlign.left,style: TextStyle(fontSize: 14),),
+                        );
+                      },
+                    ),
+                     ],
+                  )
+                ],
+              ),
+            ),
+            Card(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.black12,
+                    height: 30,
+                    padding: EdgeInsets.only(top: 5),
+                    width: double.maxFinite,
+                    child: Text("INSTRUCTIONS",style: TextStyle(fontSize: 15,letterSpacing: sqrt1_2),textAlign: TextAlign.center,),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                     children: <Widget>[
+                       ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 10,
+                      itemBuilder: (BuildContext context,int index){
+                        return ListTile(
+                          contentPadding: EdgeInsets.all(5),
+                          leading: CircleAvatar(
+                            child: Text("${index+1}",style: TextStyle(fontSize: 12,color: Colors.white),),
+                            backgroundColor: Colors.orange,
+                            radius: 10.0,
+                          ),
+                          title: Text("Hello",textAlign: TextAlign.left,style: TextStyle(fontSize: 16),),
+                        );
+                      },
+                    ),
+                     ],
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
