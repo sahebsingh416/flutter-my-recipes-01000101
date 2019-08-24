@@ -19,7 +19,7 @@ class _ShowDialogState extends State<ShowDialog> {
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close"),
+              child: new Text("Close",style: TextStyle(color: Colors.orange,fontSize: 18),),
               onPressed: () {
                 Navigator.of(context).pop();
               },

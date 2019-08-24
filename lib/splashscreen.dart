@@ -12,7 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(
-        Duration(seconds: 1),
+        Duration(seconds: 2),
         () =>
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
               return Login();
@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(accentColor: Colors.black),
+      theme: ThemeData(accentColor: Colors.orange),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
@@ -38,16 +38,16 @@ class _SplashScreenState extends State<SplashScreen> {
                     width: double.maxFinite,
                   ),
                   Container(
-                      alignment: Alignment(0.0, -0.6),
+                      alignment: Alignment(0.0, 0.0),
                       child: Text(
                         "Flavr",
                         style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.orange,
                             fontSize: 55,
                             fontWeight: FontWeight.w600),
                       )),
                   Container(
-                      alignment: Alignment(0.0, 0.8),
+                      alignment: Alignment(0.0, 0.15),
                       child: CircularProgressIndicator(
                         backgroundColor: Colors.transparent,
                       )),

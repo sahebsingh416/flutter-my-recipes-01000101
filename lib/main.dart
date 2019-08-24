@@ -3,6 +3,7 @@ import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipe.dart';
 import './splashscreen.dart';
 import './recipedetails.dart';
+import './addnew.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => Login(),
         '/recipes': (context) => Recipe(),
         '/recipe-details': (context) => RecipeDetails(),
+        '/add-new': (context) => AddNewRecipe(),
       },
       initialRoute: '/',
     );
