@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import './recipe.dart';
 import './showdialog.dart';
-import './recipedetails.dart';
-import './addnew.dart';
 
 void main() => runApp(Login());
 
@@ -31,7 +29,7 @@ class _LoginState extends State<Login> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return ShowDialog("Invalid Emaik",
+            return ShowDialog("Invalid Email",
                 "Please enter a valid email address");
           });
     }

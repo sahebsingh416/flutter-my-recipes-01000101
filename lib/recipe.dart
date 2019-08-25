@@ -49,7 +49,8 @@ class _RecipeState extends State<Recipe> {
             ),
           ],
         ),
-        body: SafeArea(
+        body: Container(
+          margin: EdgeInsets.all(0),
           child: ListView.builder(
             shrinkWrap: true,
             scrollDirection: Axis.vertical,

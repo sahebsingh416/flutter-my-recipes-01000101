@@ -19,6 +19,8 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   var _ingredientName = TextEditingController();
   var _ingredientQuant = TextEditingController();
   var _instructionController = TextEditingController();
+  String _dropDownType;
+  String _dropDownComplexity;
   bool _isValid = false;
   File _image;
   List _recipeIngredients = [];
@@ -42,10 +44,11 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   }
 
   void _addRecipe() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
       return Recipe();
     }));
   }
+
   void _checkFields() {
     if (_recipeNameController.text.length == 0 ||
         _recipeTypeController.text.length == 0 ||
@@ -71,7 +74,6 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
         maxWidth: double.maxFinite);
     setState(() {
       _image = picture;
-      //_recipeImage.add(picture);
     });
   }
 
@@ -110,15 +112,50 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                               ),
                             )),
                         Container(
+                          width: double.maxFinite,
                           //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          margin: EdgeInsets.only(left: 10, right: 10, top: 15),
-                          child: TextField(
-                            cursorColor: Colors.orange,
-                            controller: _recipeTypeController,
-                            decoration: InputDecoration(
-                                hintText: "Type*",
-                                border: OutlineInputBorder()),
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1,color: Colors.grey),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
+                          margin: EdgeInsets.only(left: 10, right: 10, top: 15),
+                          constraints: BoxConstraints.tightForFinite(),
+                          child:  Container(
+                                margin: EdgeInsets.only(left: 10,),
+                                child: Container(
+                                  margin: EdgeInsets.all(0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      hint: Text("Select Type"),
+                                      value: _dropDownType,
+                                      iconSize: 30,
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconDisabledColor: Colors.grey,
+                                      iconEnabledColor: Colors.orange,
+                                      onChanged: (String newValue) {
+                                        setState(() {
+                                          _dropDownType = newValue;
+                                        });
+                                      },
+                                      items: <String>[
+                                        'Soup',
+                                        'Pasta',
+                                        'Dal',
+                                        'Rice',
+                                        'Noodles',
+                                        'Salad'
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              ),
                         ),
                         Container(
                           //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
@@ -136,6 +173,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                           margin: EdgeInsets.only(left: 10, right: 10, top: 5),
                           child: TextField(
                             cursorColor: Colors.orange,
+                            keyboardType: TextInputType.number,
                             controller: _recipeDurationController,
                             decoration: InputDecoration(
                                 hintText: "Duration in Minutes*",
@@ -143,21 +181,61 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                           ),
                         ),
                         Container(
+                          width: double.maxFinite,
                           //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          margin: EdgeInsets.only(left: 10, right: 10, top: 5),
-                          child: TextField(
-                            cursorColor: Colors.orange,
-                            controller: _recipeComplexityController,
-                            decoration: InputDecoration(
-                                hintText: "Complexity*",
-                                border: OutlineInputBorder()),
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1,color: Colors.grey),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
+                          margin: EdgeInsets.only(left: 10, right: 10, top: 15),
+                          constraints: BoxConstraints.tightForFinite(),
+                          child:  Container(
+                                margin: EdgeInsets.only(left: 10,),
+                                child: Container(
+                                  margin: EdgeInsets.all(0),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      hint: Text("Select Type"),
+                                      value: _dropDownComplexity,
+                                      iconSize: 30,
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconDisabledColor: Colors.grey,
+                                      iconEnabledColor: Colors.orange,
+                                      onChanged: (String newValue) {
+                                        setState(() {
+                                          _dropDownComplexity = newValue;
+                                        });
+                                      },
+                                      items: <String>[
+                                        'Easy',
+                                        'Medium',
+                                        'Hard'
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          //TextField(
+                          //   cursorColor: Colors.orange,
+                          //   controller: _recipeTypeController,
+                          //   decoration: InputDecoration(
+                          //       hintText: "Type*",
+                          //       border: OutlineInputBorder()),
+                          // ),
                         ),
                         Container(
                           //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
                           margin: EdgeInsets.only(
                               left: 10, right: 10, top: 5, bottom: 15),
                           child: TextField(
+                            keyboardType: TextInputType.number,
                             cursorColor: Colors.orange,
                             controller: _recipeServesController,
                             decoration: InputDecoration(
@@ -351,7 +429,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                         color: Colors.orange,
                         child: Text(
                           "Submit",
-                          style: TextStyle(color: Colors.white,fontSize: 18),
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         onPressed: () {
                           _checkFields();
