@@ -1,9 +1,80 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_my_recipes_01000101/addnew.dart';
 import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipedetails.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import './services.dart';
+import 'package:flutter/foundation.dart';
 
-void main() => runApp(Recipe());
+Future<List<RecipesModel>> fetchRecipes(http.Client client) async {
+  final response = await client.get(
+      "http://35.160.197.175:3006/api/v1/recipe/feeds"); //, headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+
+  // Use the compute function to run parsePhotos in a separate isolate.
+  return compute(parseRecipes, response.body);
+}
+
+// A function that converts a response body into a List<Photo>.
+List<RecipesModel> parseRecipes(String responseBody) {
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed
+      .map<RecipesModel>((json) => RecipesModel.fromJson(json))
+      .toList();
+}
+
+class RecipesModel {
+  final File photo;
+  final String name;
+  final String serves;
+  final String complexity;
+  final String preparationTime;
+
+  RecipesModel(
+      {this.photo,
+      this.name,
+      this.serves,
+      this.complexity,
+      this.preparationTime});
+
+  factory RecipesModel.fromJson(Map<String, dynamic> json) {
+    return RecipesModel(
+      name: json['name'],
+      serves: json['serves'],
+      complexity: json['complexity'],
+      photo: json['photo'],
+      preparationTime: json['preparationTime'],
+    );
+  }
+}
+
+void main() {
+  runApp(Recipe());
+}
+
+// class MyHomePage extends StatelessWidget {
+//   final String title;
+
+//   MyHomePage({Key key, this.title}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: FutureBuilder<List<RecipesModel>>(
+//         future: fetchRecipes(http.Client()),
+//         builder: (context, snapshot) {
+//           if (snapshot.hasError) print(snapshot.error);
+
+//           return snapshot.hasData
+//               ? _RecipeState(recipes: snapshot.data)
+//               : Center(child: CircularProgressIndicator());
+//         },
+//       ),
+//     );
+//   }
+// }
 
 class Recipe extends StatefulWidget {
   @override
@@ -11,6 +82,14 @@ class Recipe extends StatefulWidget {
 }
 
 class _RecipeState extends State<Recipe> {
+  //var _recipes;
+  final List<RecipesModel> recipes;
+  _RecipeState({Key key, this.recipes});
+  @override
+  void initState() {
+    super.initState();
+    fetchRecipes(http.Client());
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,12 +98,17 @@ class _RecipeState extends State<Recipe> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           leading: FlatButton(
-            child: Icon(Icons.exit_to_app,size: 25,),
+            child: Icon(
+              Icons.exit_to_app,
+              size: 25,
+            ),
             onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-                  return Login();
-                }));
-              },
+              print(recipes[0].name);
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) {
+                return Login();
+              }));
+            },
           ),
           title: Text(
             "Recipes",
@@ -82,7 +166,7 @@ class _RecipeState extends State<Recipe> {
                           alignment: Alignment(-0.9, 0.0),
                           margin: EdgeInsets.only(top: 10),
                           child: Text(
-                            "Alfredo Sauce",
+                            "recipes[0].name",
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 17),
                           ),

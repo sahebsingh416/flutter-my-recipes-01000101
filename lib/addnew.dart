@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import './showdialog.dart';
 import './recipe.dart';
+import 'package:http/http.dart' as http;
 
 class AddNewRecipe extends StatefulWidget {
   @override
@@ -11,10 +12,8 @@ class AddNewRecipe extends StatefulWidget {
 }
 
 class _AddNewRecipeState extends State<AddNewRecipe> {
-  var _recipeTypeController = TextEditingController();
   var _recipeNameController = TextEditingController();
   var _recipeDurationController = TextEditingController();
-  var _recipeComplexityController = TextEditingController();
   var _recipeServesController = TextEditingController();
   var _ingredientName = TextEditingController();
   var _ingredientQuant = TextEditingController();
@@ -51,9 +50,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
 
   void _checkFields() {
     if (_recipeNameController.text.length == 0 ||
-        _recipeTypeController.text.length == 0 ||
         _recipeDurationController.text.length == 0 ||
-        _recipeComplexityController.text.length == 0 ||
         _recipeServesController.text.length == 0) {
       _isValid = false;
       showDialog(
@@ -65,6 +62,9 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     } else {
       _isValid = true;
     }
+  }
+  void _submitRecipe() async {
+    final req = await http.post("");
   }
 
   Future _getImageFromCamera() async {
