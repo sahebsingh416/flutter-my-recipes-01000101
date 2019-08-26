@@ -20,26 +20,7 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="YRO-k0-Ey4">
-                                <rect key="frame" x="109.5" y="256" width="156" height="155"/>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Recipe Book" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zz2-8V-4m9">
-                                <rect key="frame" x="16" y="158" width="343" height="71"/>
-                                <fontDescription key="fontDescription" name="Zapfino" family="Zapfino" pointSize="21"/>
-                                <color key="textColor" red="1" green="0.3411764706" blue="0.015675887223287673" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" red="0.55294117647058827" green="0.0" blue="0.019891342626027392" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
-                        <constraints>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
-                            <constraint firstItem="zz2-8V-4m9" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="16" id="34a-xf-1aM"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
-                            <constraint firstAttribute="trailing" secondItem="zz2-8V-4m9" secondAttribute="trailing" constant="16" id="ChU-fi-dwp"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="top" secondItem="zz2-8V-4m9" secondAttribute="bottom" constant="27" id="JMP-Hc-1cJ"/>
-                            <constraint firstItem="zz2-8V-4m9" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="a8L-NW-5yr"/>
-                        </constraints>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -47,7 +28,4 @@
             <point key="canvasLocation" x="84.799999999999997" y="337.33133433283359"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="LaunchImage" width="156" height="155"/>
-    </resources>
 </document>
