@@ -1,11 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import './recipe.dart';
 import './showdialog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:localstorage/localstorage.dart';
 
 void main() => runApp(Login());
 
@@ -15,10 +14,10 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final store = LocalStorage('recipes');
   bool _isValidate = false;
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
-
   void _checkFields() {
     if (emailController.text.length == 0 ||
         passwordController.text.length == 0) {
@@ -29,34 +28,51 @@ class _LoginState extends State<Login> {
             return ShowDialog("Invalid Authentication",
                 "Please enter information in required fields");
           });
-    }else if(emailController.text.contains('@')==false) {
+    } else if (emailController.text.contains('@') == false) {
       _isValidate = false;
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return ShowDialog("Invalid Email",
-                "Please enter a valid email address");
+            return ShowDialog(
+                "Invalid Email", "Please enter a valid email address");
           });
-    }
-    else {
+    } else {
       _isValidate = true;
     }
   }
 
-  void _onLogin() async{
-
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-      //return RecipeDetails();
-       return Recipe();
-      //return AddNewRecipe();
+  void _onLogin() async {
+    final login = await http.post("http://35.160.197.175:3006/api/v1/user/login",body: {"email":emailController.text,"password":passwordController.text});
+    if(login.statusCode == 400){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return ShowDialog("Invalid User",
+                "The user has not signed up yet. Please sign up before logging in.");
+          });
+    }else{
+      final res1 = await http.get(
+      "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+    var jsonResponse = jsonDecode(res1.body);
+    store.setItem('recipeJSON', jsonResponse);
+    final res2 = await http.get(
+      "http://35.160.197.175:3006/api/v1/recipe/1/ingredients", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+    jsonResponse = jsonDecode(res2.body);
+    store.setItem('ingredientsJSON', jsonResponse);
+    final res3 = await http.get(
+      "http://35.160.197.175:3006/api/v1/recipe/1/instructions", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+    jsonResponse = jsonDecode(res3.body);
+    store.setItem('instructionsJSON', jsonResponse);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
+      return Recipe();
     }));
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primaryColor: Colors.orange),
+      theme: ThemeData(primaryColor: Colors.orange,accentColor: Colors.orange),
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
         backgroundColor: Colors.white,
@@ -123,7 +139,7 @@ class _LoginState extends State<Login> {
                         padding: EdgeInsets.only(top: 20),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 35,right: 35),
+                        margin: EdgeInsets.only(left: 35, right: 35),
                         alignment: Alignment(0.0, 0.6),
                         child: ButtonTheme(
                           minWidth: double.maxFinite,
@@ -136,6 +152,7 @@ class _LoginState extends State<Login> {
                                     color: Colors.white, fontSize: 18),
                               ),
                               onPressed: () {
+                                Center(child:CircularProgressIndicator(backgroundColor: Colors.transparent,));
                                 _checkFields();
                                 if (_isValidate == true) {
                                   _onLogin();

@@ -43,9 +43,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   }
 
   void _addRecipe() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-      return Recipe();
-    }));
+    Navigator.pop(context);
   }
 
   void _checkFields() {
@@ -86,6 +84,12 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
         home: Scaffold(
           // backgroundColor: Colors.grey,
           appBar: AppBar(
+            actions: <Widget>[
+              FlatButton(
+                child: Icon(Icons.cancel),
+                onPressed: _addRecipe,
+              )
+            ],
             title: Text(
               "Add New Recipe",
               style: TextStyle(color: Colors.black, fontSize: 25),

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -7,6 +8,17 @@ class RecipeDetails extends StatefulWidget {
 }
 
 class _RecipeDetailsState extends State<RecipeDetails> {
+
+  final defaultImage = "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
+  final store = LocalStorage('recipes');
+  @override
+  void initState() {
+    super.initState();
+    var currentRecipeId = store.getItem('currentID');
+    var ingredients = store.getItem('ingredientsJSON');
+    var recipes = store.getItem('recipeJSON');
+    var instructions = store.getItem('instructionsJSON');
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
