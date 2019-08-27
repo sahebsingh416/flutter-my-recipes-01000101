@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -8,17 +9,28 @@ class RecipeDetails extends StatefulWidget {
 }
 
 class _RecipeDetailsState extends State<RecipeDetails> {
-
-  final defaultImage = "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
+  var recipeIndex;
+  var currentRecipeId;
+  var ingredients;
+  var instructions;
+  var recipes;
+  final defaultImage =
+      "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   final store = LocalStorage('recipes');
   @override
   void initState() {
     super.initState();
-    var currentRecipeId = store.getItem('currentID');
-    var ingredients = store.getItem('ingredientsJSON');
-    var recipes = store.getItem('recipeJSON');
-    var instructions = store.getItem('instructionsJSON');
+    currentRecipeId = store.getItem('currentID');
+    ingredients = store.getItem('ingredientsJSON');
+    recipes = store.getItem('recipeJSON');
+    for (int i = 0; i < recipes.length; i++) {
+      if (currentRecipeId == recipes[i]["recipeId"]) {
+        recipeIndex = i;
+      }
+    }
+    instructions = store.getItem('instructionsJSON');
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,8 +52,21 @@ class _RecipeDetailsState extends State<RecipeDetails> {
             Stack(
               alignment: Alignment(0.0, -1.0),
               children: <Widget>[
-                Image.asset(
-                  "images/food.jpg",
+                CachedNetworkImage(
+                  height: 250,
+                  width: double.maxFinite,
+                  imageUrl: recipes[recipeIndex]["photo"] == null
+                      ? defaultImage
+                      : recipes[recipeIndex]["photo"],
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(
+                    child: Container(
+                        height: 30,
+                        width: 30,
+                        child: new CircularProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                        )),
+                  ),
                 ),
                 new Positioned(
                   top: 10,
@@ -67,7 +92,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     child: Text(
-                      "Alfredo Sauce",
+                      recipes[recipeIndex]["name"],
                       textAlign: TextAlign.left,
                       style: TextStyle(fontSize: 17),
                     ),
@@ -92,7 +117,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     padding: EdgeInsets.only(left: 1),
                                   ),
                                   Text(
-                                    "25 Minutes",
+                                    recipes[recipeIndex]["preparationTime"],
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 14,
@@ -107,7 +132,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                             padding: EdgeInsets.only(left: 8, right: 10),
                           ),
                           Container(
-                              width: 80,
+                              width: 120,
                               child: Row(
                                 children: <Widget>[
                                   Icon(
@@ -118,7 +143,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     padding: EdgeInsets.only(left: 6, right: 1),
                                   ),
                                   Text(
-                                    "Easy",
+                                    recipes[recipeIndex]["complexity"],
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 14,
@@ -143,7 +168,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                 padding: EdgeInsets.only(left: 5),
                               ),
                               Text(
-                                "4 People",
+                                recipes[recipeIndex]["serves"],
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                   fontSize: 14,
@@ -180,13 +205,16 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: 10,
+                        itemCount: 1,
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
                             contentPadding: EdgeInsets.all(5),
-                            leading: Icon(Icons.fiber_manual_record,color: Colors.orange,),
+                            leading: Icon(
+                              Icons.fiber_manual_record,
+                              color: Colors.orange,
+                            ),
                             title: Text(
-                              "Hello",
+                              "2 Spring Onions",
                               textAlign: TextAlign.left,
                               style: TextStyle(fontSize: 18),
                             ),
@@ -219,7 +247,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: 10,
+                        itemCount: 1,
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
                             contentPadding: EdgeInsets.all(5),
@@ -233,7 +261,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               radius: 10.0,
                             ),
                             title: Text(
-                              "Hello",
+                              "Saute onions till it become translucent",
                               textAlign: TextAlign.left,
                               style: TextStyle(fontSize: 16),
                             ),

@@ -51,16 +51,19 @@ class _LoginState extends State<Login> {
                 "The user has not signed up yet. Please sign up before logging in.");
           });
     }else{
+      final loginJSON = jsonDecode(login.body);
+      final token = loginJSON["token"];
+      store.setItem('userToken', token);
       final res1 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+      "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : token});
     var jsonResponse = jsonDecode(res1.body);
     store.setItem('recipeJSON', jsonResponse);
     final res2 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/1/ingredients", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+      "http://35.160.197.175:3006/api/v1/recipe/1/ingredients", headers: {HttpHeaders.authorizationHeader : token});
     jsonResponse = jsonDecode(res2.body);
     store.setItem('ingredientsJSON', jsonResponse);
     final res3 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/1/instructions", headers: {HttpHeaders.authorizationHeader : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"});
+      "http://35.160.197.175:3006/api/v1/recipe/1/instructions", headers: {HttpHeaders.authorizationHeader : token});
     jsonResponse = jsonDecode(res3.body);
     store.setItem('instructionsJSON', jsonResponse);
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){

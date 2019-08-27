@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:localstorage/localstorage.dart';
 import 'dart:async';
 import 'dart:io';
 import './showdialog.dart';
 import './recipe.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AddNewRecipe extends StatefulWidget {
@@ -12,12 +14,14 @@ class AddNewRecipe extends StatefulWidget {
 }
 
 class _AddNewRecipeState extends State<AddNewRecipe> {
+  final store = LocalStorage('recipes');
   var _recipeNameController = TextEditingController();
   var _recipeDurationController = TextEditingController();
   var _recipeServesController = TextEditingController();
   var _ingredientName = TextEditingController();
   var _ingredientQuant = TextEditingController();
   var _instructionController = TextEditingController();
+  var count;
   String _dropDownType;
   String _dropDownComplexity;
   bool _isValid = false;
@@ -62,8 +66,30 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     }
   }
   void _submitRecipe() async {
-    final req = await http.post("");
+    final req = await http.post("http://35.160.197.175:3006/api/v1/recipe/add",body: {
+	"name": _recipeNameController.text,
+	"preparationTime": _recipeDurationController.text+" Min" ,
+	"serves": int.parse(_recipeServesController.text),
+	"complexity": _dropDownType
+});
+final token = store.getItem('userToken');
+final res1 = await http.get(
+      "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : token});
+    var jsonResponse = jsonDecode(res1.body);
+    store.setItem('recipeJSON', jsonResponse);
+    count = store.getItem('recipeJSON').length;
+    final req1 = await http.post("http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo",body: {
+      "photo": _image,
+      "recipeId": count
+});
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
+      return Recipe();
+    }));
+setState(() {
+  count++;
+});
   }
+
 
   Future _getImageFromCamera() async {
     File picture = await ImagePicker.pickImage(
@@ -131,7 +157,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                   margin: EdgeInsets.all(0),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
-                                      hint: Text("Select Type"),
+                                      hint: Text("Select Type*"),
                                       value: _dropDownType,
                                       iconSize: 30,
                                       icon: Icon(Icons.arrow_drop_down),
@@ -192,7 +218,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                             border: Border.all(width: 1,color: Colors.grey),
                             borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
-                          margin: EdgeInsets.only(left: 10, right: 10, top: 15),
+                          margin: EdgeInsets.only(left: 10, right: 10, top: 5),
                           constraints: BoxConstraints.tightForFinite(),
                           child:  Container(
                                 margin: EdgeInsets.only(left: 10,),
@@ -200,7 +226,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                   margin: EdgeInsets.all(0),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
-                                      hint: Text("Select Type"),
+                                      hint: Text("Select Complexity*"),
                                       value: _dropDownComplexity,
                                       iconSize: 30,
                                       icon: Icon(Icons.arrow_drop_down),
