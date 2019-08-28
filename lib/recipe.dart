@@ -92,14 +92,15 @@ class _RecipeState extends State<Recipe> {
                                   ? widget.defaultImage
                                   : recipes[index]["photo"],
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => Center(
-                                child: Container(
-                                    height: 30,
-                                    width: 30,
-                                    child: new CircularProgressIndicator(
-                                      backgroundColor: Colors.transparent,
-                                    )),
-                              ),
+                              placeholder: (context, url) => Skeleton(height: 150,width: double.maxFinite,),
+                              // (context, url) => Center(
+                              //   child: Container(
+                              //       height: 30,
+                              //       width: 30,
+                              //       child: new CircularProgressIndicator(
+                              //         backgroundColor: Colors.transparent,
+                              //       )),
+                              // ),
                             ),
                           ),
                           Container(

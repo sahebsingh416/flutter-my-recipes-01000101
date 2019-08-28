@@ -66,6 +66,11 @@ class _LoginState extends State<Login> {
       final token = loginJSON["token"];
       var jsonResponse;
       store.setItem('userToken', token);
+      final res1 = await http.get(
+          "http://35.160.197.175:3006/api/v1/recipe/feeds",
+          headers: {HttpHeaders.authorizationHeader: token});
+      jsonResponse = jsonDecode(res1.body);
+      store.setItem('recipeJSON', jsonResponse);
       final res2 = await http.get(
           "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
           headers: {HttpHeaders.authorizationHeader: token});
