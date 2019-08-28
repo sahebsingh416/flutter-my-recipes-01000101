@@ -14,6 +14,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  bool _apiCalled = false;
   final store = LocalStorage('recipes');
   bool _isValidate = false;
   var emailController = TextEditingController();
@@ -42,40 +43,51 @@ class _LoginState extends State<Login> {
   }
 
   void _onLogin() async {
-    final login = await http.post("http://35.160.197.175:3006/api/v1/user/login",body: {"email":emailController.text,"password":passwordController.text});
-    if(login.statusCode == 400){
+    setState(() {
+      _apiCalled = true;
+    });
+    final login = await http
+        .post("http://35.160.197.175:3006/api/v1/user/login", body: {
+      "email": emailController.text,
+      "password": passwordController.text
+    });
+    if (login.statusCode == 400) {
+      setState(() {
+        _apiCalled = false;
+      });
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return ShowDialog("Invalid User",
                 "The user has not signed up yet. Please sign up before logging in.");
           });
-    }else{
+    } else {
       final loginJSON = jsonDecode(login.body);
       final token = loginJSON["token"];
+      var jsonResponse;
       store.setItem('userToken', token);
-      final res1 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : token});
-    var jsonResponse = jsonDecode(res1.body);
-    store.setItem('recipeJSON', jsonResponse);
-    final res2 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/1/ingredients", headers: {HttpHeaders.authorizationHeader : token});
-    jsonResponse = jsonDecode(res2.body);
-    store.setItem('ingredientsJSON', jsonResponse);
-    final res3 = await http.get(
-      "http://35.160.197.175:3006/api/v1/recipe/1/instructions", headers: {HttpHeaders.authorizationHeader : token});
-    jsonResponse = jsonDecode(res3.body);
-    store.setItem('instructionsJSON', jsonResponse);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
-      return Recipe();
-    }));
+      final res2 = await http.get(
+          "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
+          headers: {HttpHeaders.authorizationHeader: token});
+      jsonResponse = jsonDecode(res2.body);
+      store.setItem('ingredientsJSON', jsonResponse);
+      final res3 = await http.get(
+          "http://35.160.197.175:3006/api/v1/recipe/1/instructions",
+          headers: {HttpHeaders.authorizationHeader: token});
+      jsonResponse = jsonDecode(res3.body);
+      store.setItem('instructionsJSON', jsonResponse);
+      try {Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
+        return Recipe();
+      }));}
+      catch(Exception){}
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primaryColor: Colors.orange,accentColor: Colors.orange),
+      theme: ThemeData(primaryColor: Colors.orange, accentColor: Colors.orange),
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
         backgroundColor: Colors.white,
@@ -155,14 +167,21 @@ class _LoginState extends State<Login> {
                                     color: Colors.white, fontSize: 18),
                               ),
                               onPressed: () {
-                                Center(child:CircularProgressIndicator(backgroundColor: Colors.transparent,));
                                 _checkFields();
                                 if (_isValidate == true) {
                                   _onLogin();
                                 }
                               }),
                         ),
-                      )
+                      ),
+                      Container(
+                        alignment: Alignment(0.0, 0.85),
+                        child: _apiCalled == true
+                            ? CircularProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                              )
+                            : Text(""),
+                      ),
                     ],
                   ),
                 ),

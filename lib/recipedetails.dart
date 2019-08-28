@@ -30,6 +30,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     }
     instructions = store.getItem('instructionsJSON');
   }
+  void _backToRecipes(){
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,10 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          leading: FlatButton(
+            child: Icon(Icons.arrow_back_ios),
+            onPressed: _backToRecipes,
+          ),
           title: Text(
             "Recipes Details",
             style: TextStyle(

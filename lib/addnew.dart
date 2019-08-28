@@ -21,7 +21,6 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   var _ingredientName = TextEditingController();
   var _ingredientQuant = TextEditingController();
   var _instructionController = TextEditingController();
-  var count;
   String _dropDownType;
   String _dropDownComplexity;
   bool _isValid = false;
@@ -66,38 +65,36 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     }
   }
   void _submitRecipe() async {
-    final req = await http.post("http://35.160.197.175:3006/api/v1/recipe/add",body: {
+
+    final token = store.getItem('userToken');
+    final req = await http.post("http://35.160.197.175:3006/api/v1/recipe/add", headers: {HttpHeaders.authorizationHeader : token},body: {
 	"name": _recipeNameController.text,
 	"preparationTime": _recipeDurationController.text+" Min" ,
-	"serves": int.parse(_recipeServesController.text),
+	"serves": _recipeServesController.text,
 	"complexity": _dropDownType
 });
-final token = store.getItem('userToken');
+// var addResponse = jsonDecode(req.body);
 final res1 = await http.get(
       "http://35.160.197.175:3006/api/v1/recipe/feeds", headers: {HttpHeaders.authorizationHeader : token});
     var jsonResponse = jsonDecode(res1.body);
+    print(jsonResponse);
     store.setItem('recipeJSON', jsonResponse);
-    count = store.getItem('recipeJSON').length;
-    final req1 = await http.post("http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo",body: {
-      "photo": _image,
-      "recipeId": count
-});
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_){
-      return Recipe();
-    }));
-setState(() {
-  count++;
-});
+//     final req1 = await http.post("http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo", headers: {HttpHeaders.authorizationHeader : token},body: {
+//       "photo": "image_picker_ACCC523E-1603-45C5-8573-863A472AF474-16015-0000099FCEA55858.jpg",
+//       //"recipeId": addResponse["id"]
+// });
+    _addRecipe();
   }
 
 
-  Future _getImageFromCamera() async {
+  Future _getImageFromGallery() async {
     File picture = await ImagePicker.pickImage(
         source: ImageSource.gallery,
         maxHeight: 250,
         maxWidth: double.maxFinite);
     setState(() {
       _image = picture;
+      print(picture.path);
     });
   }
 
@@ -444,7 +441,7 @@ setState(() {
                               "Browse",
                               style: TextStyle(color: Colors.white),
                             ),
-                            onPressed: _getImageFromCamera,
+                            onPressed: _getImageFromGallery,
                           )),
                     ],
                   ),
@@ -464,7 +461,7 @@ setState(() {
                         onPressed: () {
                           _checkFields();
                           if (_isValid) {
-                            _addRecipe();
+                            _submitRecipe();
                           }
                         }),
                   ),
