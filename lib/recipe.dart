@@ -4,6 +4,7 @@ import 'package:flutter_my_recipes_01000101/addnew.dart';
 import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipedetails.dart';
 import 'package:localstorage/localstorage.dart';
+import './Skeleton.dart';
 
 void main() {
   runApp(Recipe());
