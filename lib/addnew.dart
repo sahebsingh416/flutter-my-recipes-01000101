@@ -65,13 +65,13 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     }
   }
   void _submitRecipe() async {
-
+    print(_dropDownComplexity);
     final token = store.getItem('userToken');
     final req = await http.post("http://35.160.197.175:3006/api/v1/recipe/add", headers: {HttpHeaders.authorizationHeader : token},body: {
 	"name": _recipeNameController.text,
 	"preparationTime": _recipeDurationController.text+" Min" ,
 	"serves": _recipeServesController.text,
-	"complexity": _dropDownType
+	"complexity": _dropDownComplexity,
 });
 // var addResponse = jsonDecode(req.body);
 final res1 = await http.get(

@@ -5,7 +5,7 @@ import './showdialog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
-
+// import './profile.dart';
 void main() => runApp(Login());
 
 class Login extends StatefulWidget {
@@ -15,6 +15,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool _apiCalled = false;
+  var fullname;
+  var email;
   final store = LocalStorage('recipes');
   bool _isValidate = false;
   var emailController = TextEditingController();
@@ -63,24 +65,23 @@ class _LoginState extends State<Login> {
           });
     } else {
       final loginJSON = jsonDecode(login.body);
+      fullname = loginJSON["firstName"]+" "+loginJSON["lastName"];
+      email = loginJSON["email"];
+      store.setItem('fullName', fullname);
+      store.setItem('email', email);
       final token = loginJSON["token"];
-      var jsonResponse;
       store.setItem('userToken', token);
-      final res1 = await http.get(
-          "http://35.160.197.175:3006/api/v1/recipe/feeds",
-          headers: {HttpHeaders.authorizationHeader: token});
-      jsonResponse = jsonDecode(res1.body);
-      store.setItem('recipeJSON', jsonResponse);
-      final res2 = await http.get(
-          "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
-          headers: {HttpHeaders.authorizationHeader: token});
-      jsonResponse = jsonDecode(res2.body);
-      store.setItem('ingredientsJSON', jsonResponse);
-      final res3 = await http.get(
-          "http://35.160.197.175:3006/api/v1/recipe/1/instructions",
-          headers: {HttpHeaders.authorizationHeader: token});
-      jsonResponse = jsonDecode(res3.body);
-      store.setItem('instructionsJSON', jsonResponse);
+      //var jsonResponse;
+      // final res2 = await http.get(
+      //     "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
+      //     headers: {HttpHeaders.authorizationHeader: token});
+      // jsonResponse = jsonDecode(res2.body);
+      // store.setItem('ingredientsJSON', jsonResponse);
+      // final res3 = await http.get(
+      //     "http://35.160.197.175:3006/api/v1/recipe/1/instructions",
+      //     headers: {HttpHeaders.authorizationHeader: token});
+      // jsonResponse = jsonDecode(res3.body);
+      // store.setItem('instructionsJSON', jsonResponse);
       try {Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
         return Recipe();
       }));}

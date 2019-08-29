@@ -5,6 +5,9 @@ import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipedetails.dart';
 import 'package:localstorage/localstorage.dart';
 import './Skeleton.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
 void main() {
   runApp(Recipe());
@@ -18,13 +21,27 @@ class Recipe extends StatefulWidget {
 }
 
 class _RecipeState extends State<Recipe> {
+  bool _apiCalled = false;
   final store = LocalStorage("recipes");
   var recipes;
   @override
   void initState() {
     super.initState();
     setState(() {
+      _getRecipes();
       recipes = store.getItem('recipeJSON');
+    });
+  }
+
+  void _getRecipes() async {
+    final token = store.getItem('userToken');
+    final res1 = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/feeds",
+        headers: {HttpHeaders.authorizationHeader: token});
+    final jsonResponse = jsonDecode(res1.body);
+    store.setItem('recipeJSON', jsonResponse);
+    setState(() {
+      _apiCalled = true;
     });
   }
 
@@ -92,21 +109,16 @@ class _RecipeState extends State<Recipe> {
                                   ? widget.defaultImage
                                   : recipes[index]["photo"],
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => Skeleton(height: 150,width: double.maxFinite,),
-                              // (context, url) => Center(
-                              //   child: Container(
-                              //       height: 30,
-                              //       width: 30,
-                              //       child: new CircularProgressIndicator(
-                              //         backgroundColor: Colors.transparent,
-                              //       )),
-                              // ),
+                              placeholder: (context, url) => Skeleton(
+                                height: 150,
+                                width: double.maxFinite,
+                              ),
                             ),
                           ),
                           Container(
                             alignment: Alignment(-0.8, 0.0),
                             margin: EdgeInsets.only(top: 10),
-                            child: Text(
+                            child: _apiCalled == false ? Skeleton() : Text(
                               "Soup",
                               textAlign: TextAlign.left,
                               style: TextStyle(color: Colors.grey),
@@ -115,7 +127,7 @@ class _RecipeState extends State<Recipe> {
                           Container(
                             alignment: Alignment(-0.9, 0.0),
                             margin: EdgeInsets.only(top: 10),
-                            child: Text(
+                            child: _apiCalled == false ? Skeleton() : Text(
                               recipes[index]["name"],
                               textAlign: TextAlign.left,
                               style: TextStyle(fontSize: 17),
@@ -129,9 +141,9 @@ class _RecipeState extends State<Recipe> {
                                   // Padding(
                                   //   padding: EdgeInsets.only(left: 15),
                                   // ),
-                                  Container(
+                                  _apiCalled == false ? Skeleton(width: 80,) :Container(
                                       width: 120,
-                                      child: Row(
+                                      child: _apiCalled == false ? Skeleton() : Row(
                                         children: <Widget>[
                                           Icon(
                                             Icons.access_time,
@@ -155,7 +167,7 @@ class _RecipeState extends State<Recipe> {
                                   // Padding(
                                   //   padding: EdgeInsets.only(left: 2, right: 4),
                                   // ),
-                                  Container(
+                                  _apiCalled == false ? Container(margin: EdgeInsets.only(left: 5),child:Skeleton(width: 80)) :Container(
                                       width: 90,
                                       child: Row(
                                         children: <Widget>[
@@ -182,7 +194,7 @@ class _RecipeState extends State<Recipe> {
                                   // Padding(
                                   //   padding: EdgeInsets.only(left: 0),
                                   // ),
-                                  Container(
+                                  _apiCalled == false ? Container(margin: EdgeInsets.only(left: 5),child:Skeleton(width: 80)) : Container(
                                       child: Row(
                                     children: <Widget>[
                                       Icon(
