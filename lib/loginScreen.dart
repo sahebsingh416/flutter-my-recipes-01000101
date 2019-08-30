@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_my_recipes_01000101/profile.dart';
 import './recipe.dart';
 import './showdialog.dart';
 import 'package:http/http.dart' as http;
@@ -83,7 +84,7 @@ class _LoginState extends State<Login> {
       // jsonResponse = jsonDecode(res3.body);
       // store.setItem('instructionsJSON', jsonResponse);
       try {Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-        return Recipe();
+        return Profile();
       }));}
       catch(Exception){}
     }

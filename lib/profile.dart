@@ -11,9 +11,11 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   File _image;
+  var _bioController = TextEditingController();
   final store = LocalStorage('recipes');
   var _fullName;
   var _email;
+  List moods = [0, 0, 0, 0, 0];
   Future _getImageFromGallery() async {
     File picture = await ImagePicker.pickImage(
         source: ImageSource.gallery,
@@ -29,14 +31,14 @@ class _ProfileState extends State<Profile> {
     super.initState();
     setState(() {
       _fullName = store.getItem('fullName');
-    _email = store.getItem('email');
+      _email = store.getItem('email');
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(accentColor: Colors.orange),
+      theme: ThemeData(accentColor: Colors.orange, primaryColor: Colors.orange),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -83,11 +85,14 @@ class _ProfileState extends State<Profile> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: _image == null ? AssetImage("images/food.jpg") :FileImage(_image),
+                                fit: BoxFit.fill,
+                                image: _image == null
+                                    ? AssetImage("images/food.jpg")
+                                    : FileImage(_image),
+                              ),
                             ),
                           ),
-                        ),),
+                        ),
                         new Positioned(
                           top: 155,
                           left: 110,
@@ -100,17 +105,94 @@ class _ProfileState extends State<Profile> {
                               shape: BoxShape.circle,
                             ),
                             child: Center(
-                                child: IconButton(icon: Icon(Icons.camera,color: Colors.orange,),onPressed: _getImageFromGallery,)),
+                                child: IconButton(
+                              icon: Icon(
+                                Icons.camera,
+                                color: Colors.orange,
+                              ),
+                              onPressed: _getImageFromGallery,
+                            )),
                           ),
-                        ),
-                        new Positioned(
-                          top: 180,
-                          child: Text(_fullName),
                         ),
                       ],
                     ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 25),
+                        child: Text(
+                          _fullName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 10.0,
+                                color: Colors.blue,
+                                offset: Offset(5.0, 5.0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
-                ))
+                )),
+            Container(
+              height: 45,
+              width: double.maxFinite,
+              margin: EdgeInsets.only(left: 16, top: 25, right: 16),
+              child: Stack(
+                children: <Widget>[
+                  new Positioned(
+                    top: 15,
+                    child: Text(
+                      "Email:",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  new Positioned(
+                    left: 60,
+                    top: 15,
+                    child: Text(_email,style: TextStyle(fontSize: 16),),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: 250,
+              width: double.maxFinite,
+              margin: EdgeInsets.only(left: 16, top: 25, right: 16),
+              child: Stack(
+                children: <Widget>[
+                  new Positioned(
+                    top: 18,
+                    child: Text(
+                      "Bio:",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    )
+                  ),
+                  new Positioned(
+                    left: 60,
+                    top: 0,
+                    child: Container(
+                      width: 250,
+                      child: TextField(
+                            cursorColor: Colors.orange,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 4,
+                            maxLength: 160,
+                            decoration: InputDecoration(
+                                hintText: "Whats on your mind?",
+                                border: OutlineInputBorder()),
+                            controller: _bioController,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
