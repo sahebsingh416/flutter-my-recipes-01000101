@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
       // jsonResponse = jsonDecode(res3.body);
       // store.setItem('instructionsJSON', jsonResponse);
       try {Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-        return Profile();
+        return Recipe();
       }));}
       catch(Exception){}
     }
