@@ -22,10 +22,12 @@ class Recipe extends StatefulWidget {
 
 class _RecipeState extends State<Recipe> {
   bool _apiCalled = false;
+  bool _isSearched = true;
+  bool _noResultsFound = false;
   final store = LocalStorage("recipes");
   final TextEditingController _searchController = TextEditingController();
-  String _searchText;
-  _RecipeState(){
+  String _searchText = "";
+  _RecipeState() {
     _searchController.addListener(() {
       if (_searchController.text.isEmpty) {
         setState(() {
@@ -34,6 +36,7 @@ class _RecipeState extends State<Recipe> {
       } else {
         setState(() {
           _searchText = _searchController.text;
+          _searchedRecipes();
         });
       }
     });
@@ -56,6 +59,7 @@ class _RecipeState extends State<Recipe> {
     super.initState();
     setState(() {
       _getRecipes();
+      _searchedRecipes();
       recipes = store.getItem('recipeJSON');
     });
   }
@@ -73,19 +77,31 @@ class _RecipeState extends State<Recipe> {
   }
 
   void _searchedRecipes() async {
-    final _api = "http://35.160.197.175:3006/api/v1/recipe/feeds?q=" + _searchText;
+    setState(() {
+      _isSearched = false;
+    });
+    final _api =
+        "http://35.160.197.175:3006/api/v1/recipe/feeds?q=" + _searchText;
     final token = store.getItem('userToken');
     final res1 =
         await http.get(_api, headers: {HttpHeaders.authorizationHeader: token});
     final jsonResponse = jsonDecode(res1.body);
+    store.setItem('searchedJSON', jsonResponse);
     setState(() {
-      recipes = jsonResponse;
+      if (jsonResponse.length == 0) {
+        _noResultsFound = true;
+      } else {
+        recipes = store.getItem('searchedJSON');
+        _isSearched = true;
+        _noResultsFound = false;
+      }
     });
   }
 
   void _searchPressed() async {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
+        _searchController.clear();
         this._searchIcon = new Icon(
           Icons.close,
           color: Colors.black,
@@ -99,12 +115,12 @@ class _RecipeState extends State<Recipe> {
               hintText: 'Search...'),
         );
         setState(() {
-          if (_searchController.text.isNotEmpty) {
-            _searchedRecipes();
-          }
+          recipes = store.getItem('searchedJSON');
         });
       } else {
         setState(() {
+          _isSearched = true;
+          _noResultsFound = false;
           recipes = store.getItem('recipeJSON');
         });
         this._searchIcon = new Icon(
@@ -163,84 +179,132 @@ class _RecipeState extends State<Recipe> {
             ),
           ],
         ),
-        body: SafeArea(
-          child: Container(
-            margin: EdgeInsets.all(0),
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: recipes.length,
-              itemBuilder: (BuildContext context, int index) {
-                return FlatButton(
-                  child: Card(
-                      margin: EdgeInsets.all(10),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 150,
-                            width: double.infinity,
-                            child: CachedNetworkImage(
-                              imageUrl: recipes[index]["photo"] == null
-                                  ? widget.defaultImage
-                                  : recipes[index]["photo"],
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Skeleton(
-                                height: 150,
-                                width: double.maxFinite,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment(-0.8, 0.0),
-                            margin: EdgeInsets.only(top: 10),
-                            child: _apiCalled == false
-                                ? Skeleton()
-                                : Text(
-                                    "Soup",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                          ),
-                          Container(
-                            alignment: Alignment(-0.9, 0.0),
-                            margin: EdgeInsets.only(top: 10),
-                            child: _apiCalled == false
-                                ? Skeleton()
-                                : Text(
-                                    recipes[index]["name"],
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(fontSize: 17),
-                                  ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 20, bottom: 20),
-                            child: Row(
+        body: _isSearched == false
+            ? (_noResultsFound == false
+                ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : Container(
+                    child: Center(
+                      child: Text("No Recipe Founds"),
+                    ),
+                  ))
+            : SafeArea(
+                child: Container(
+                  margin: EdgeInsets.all(0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: recipes.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return FlatButton(
+                        child: Card(
+                            margin: EdgeInsets.all(10),
+                            child: Column(
                               children: <Widget>[
-                                Row(children: <Widget>[
-                                  // Padding(
-                                  //   padding: EdgeInsets.only(left: 15),
-                                  // ),
-                                  _apiCalled == false
-                                      ? Skeleton(
-                                          width: 80,
-                                        )
-                                      : Container(
-                                          width: 120,
-                                          child: _apiCalled == false
-                                              ? Skeleton()
-                                              : Row(
+                                Container(
+                                  height: 150,
+                                  width: double.infinity,
+                                  child: CachedNetworkImage(
+                                    imageUrl: recipes[index]["photo"] == null
+                                        ? widget.defaultImage
+                                        : recipes[index]["photo"],
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Skeleton(
+                                      height: 150,
+                                      width: double.maxFinite,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  alignment: Alignment(-0.8, 0.0),
+                                  margin: EdgeInsets.only(top: 10),
+                                  child: _apiCalled == false
+                                      ? Skeleton()
+                                      : Text(
+                                          "Soup",
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                ),
+                                Container(
+                                  alignment: Alignment(-0.9, 0.0),
+                                  margin: EdgeInsets.only(top: 10),
+                                  child: _apiCalled == false
+                                      ? Skeleton()
+                                      : Text(
+                                          recipes[index]["name"],
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(fontSize: 17),
+                                        ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(top: 20, bottom: 20),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Row(children: <Widget>[
+                                        // Padding(
+                                        //   padding: EdgeInsets.only(left: 15),
+                                        // ),
+                                        _apiCalled == false
+                                            ? Skeleton(
+                                                width: 80,
+                                              )
+                                            : Container(
+                                                width: 120,
+                                                child: _apiCalled == false
+                                                    ? Skeleton()
+                                                    : Row(
+                                                        children: <Widget>[
+                                                          Icon(
+                                                            Icons.access_time,
+                                                            color: Colors.grey,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 0),
+                                                          ),
+                                                          Text(
+                                                            recipes[index][
+                                                                "preparationTime"],
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ))
+                                      ]),
+                                      Row(children: <Widget>[
+                                        // Padding(
+                                        //   padding: EdgeInsets.only(left: 2, right: 4),
+                                        // ),
+                                        _apiCalled == false
+                                            ? Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                child: Skeleton(width: 80))
+                                            : Container(
+                                                width: 90,
+                                                child: Row(
                                                   children: <Widget>[
                                                     Icon(
-                                                      Icons.access_time,
+                                                      Icons.view_list,
                                                       color: Colors.grey,
                                                     ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 0),
-                                                    ),
+                                                    // Padding(
+                                                    //   padding: EdgeInsets.only(
+                                                    //       left: 2, right: 5),
+                                                    // ),
                                                     Text(
                                                       recipes[index]
-                                                          ["preparationTime"],
+                                                          ["complexity"],
                                                       textAlign: TextAlign.left,
                                                       style: TextStyle(
                                                         fontSize: 14,
@@ -249,84 +313,56 @@ class _RecipeState extends State<Recipe> {
                                                     ),
                                                   ],
                                                 ))
-                                ]),
-                                Row(children: <Widget>[
-                                  // Padding(
-                                  //   padding: EdgeInsets.only(left: 2, right: 4),
-                                  // ),
-                                  _apiCalled == false
-                                      ? Container(
-                                          margin: EdgeInsets.only(left: 5),
-                                          child: Skeleton(width: 80))
-                                      : Container(
-                                          width: 90,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.view_list,
-                                                color: Colors.grey,
-                                              ),
-                                              // Padding(
-                                              //   padding: EdgeInsets.only(
-                                              //       left: 2, right: 5),
-                                              // ),
-                                              Text(
-                                                recipes[index]["complexity"],
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                ]),
-                                Row(children: <Widget>[
-                                  // Padding(
-                                  //   padding: EdgeInsets.only(left: 0),
-                                  // ),
-                                  _apiCalled == false
-                                      ? Container(
-                                          margin: EdgeInsets.only(left: 5),
-                                          child: Skeleton(width: 80))
-                                      : Container(
-                                          child: Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.restaurant,
-                                              color: Colors.grey,
-                                              size: 18,
-                                            ),
-                                            // Padding(
-                                            //   padding: EdgeInsets.only(left: 5),
-                                            // ),
-                                            Text(
-                                              recipes[index]["serves"],
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ))
-                                ]),
+                                      ]),
+                                      Row(children: <Widget>[
+                                        // Padding(
+                                        //   padding: EdgeInsets.only(left: 0),
+                                        // ),
+                                        _apiCalled == false
+                                            ? Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                child: Skeleton(width: 80))
+                                            : Container(
+                                                child: Row(
+                                                children: <Widget>[
+                                                  Icon(
+                                                    Icons.restaurant,
+                                                    color: Colors.grey,
+                                                    size: 18,
+                                                  ),
+                                                  // Padding(
+                                                  //   padding: EdgeInsets.only(left: 5),
+                                                  // ),
+                                                  Text(
+                                                    recipes[index]["serves"],
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ))
+                                      ]),
+                                    ],
+                                  ),
+                                ),
                               ],
-                            ),
-                          ),
-                        ],
-                      )),
-                  onPressed: () {
-                    store.setItem('currentID', recipes[index]["recipeId"]);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) {
-                      return RecipeDetails();
-                    }));
-                  },
-                );
-              },
-            ),
-          ),
-        ),
+                            )),
+                        onPressed: () {
+                          store.setItem(
+                              'currentID', recipes[index]["recipeId"]);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) {
+                            return RecipeDetails();
+                          }));
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
       ),
     );
   }
