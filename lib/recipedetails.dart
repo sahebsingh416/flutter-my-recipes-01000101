@@ -14,6 +14,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   var ingredients;
   var instructions;
   var recipes;
+  Icon _favIcon;
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   final store = LocalStorage('recipes');
@@ -26,12 +27,27 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     for (int i = 0; i < recipes.length; i++) {
       if (currentRecipeId == recipes[i]["recipeId"]) {
         recipeIndex = i;
+        if(recipes[i]["inCookingList"]==1){
+          _favIcon = Icon(Icons.favorite,color: Colors.white,);
+        }else{
+          _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
+        }
       }
     }
     instructions = store.getItem('instructionsJSON');
   }
   void _backToRecipes(){
     Navigator.pop(context);
+  }
+
+  void _addToFavorite(){
+    setState(() {
+      if(_favIcon.icon == Icons.favorite){
+        _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
+      }else{
+        _favIcon = Icon(Icons.favorite,color: Colors.white,);
+      }
+    });
   }
 
   @override
@@ -78,9 +94,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 new Positioned(
                   top: 10,
                   right: 10,
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.white,
+                  child: IconButton(
+                    icon: _favIcon,
+                    onPressed: _addToFavorite
                   ),
                 ),
               ],
