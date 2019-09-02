@@ -28,7 +28,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       if (currentRecipeId == recipes[i]["recipeId"]) {
         recipeIndex = i;
         if(recipes[i]["inCookingList"]==1){
-          _favIcon = Icon(Icons.favorite,color: Colors.white,);
+          _favIcon = Icon(Icons.favorite,color: Colors.red,);
         }else{
           _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
         }
@@ -45,7 +45,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       if(_favIcon.icon == Icons.favorite){
         _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
       }else{
-        _favIcon = Icon(Icons.favorite,color: Colors.white,);
+        _favIcon = Icon(Icons.favorite,color: Colors.red,);
       }
     });
   }

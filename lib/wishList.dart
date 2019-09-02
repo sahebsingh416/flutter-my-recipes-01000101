@@ -329,7 +329,7 @@ class _WishListState extends State<WishList> {
                               ],
                             )),
                         onPressed: () {
-                          store.setItem(
+                          store2.setItem(
                               'currentID', wishList[index]["recipeId"]);
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) {
