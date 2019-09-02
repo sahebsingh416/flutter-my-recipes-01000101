@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
       theme: ThemeData(accentColor: Colors.orange),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        resizeToAvoidBottomPadding: false,
         body: Container(
           height: double.maxFinite,
           width: double.maxFinite,
