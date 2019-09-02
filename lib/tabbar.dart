@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_my_recipes_01000101/wishList.dart';
 import './recipe.dart';
 import './profile.dart';
 
@@ -13,7 +14,7 @@ class Tabbar extends StatefulWidget {
 
 class _TabbarState extends State<Tabbar> {
   int currentTabIndex = 0;
-  List<Widget> tabs = [Recipe(), Profile()];
+  List<Widget> tabs = [Recipe(), WishList(), Profile()];
   onTapped(int index) {
     setState(() {
       currentTabIndex = index;
@@ -39,15 +40,15 @@ class _TabbarState extends State<Tabbar> {
               title: Text("Recipes"),
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.favorite),
+              title: Text("Wishlist"),
+            ),
+            BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
               ),
               title: Text("Profile"),
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.person),
-            //   title: Text("Profile"),
-            // )
           ],
         ),
       ),

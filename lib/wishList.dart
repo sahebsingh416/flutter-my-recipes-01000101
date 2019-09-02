@@ -10,24 +10,25 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() {
-  runApp(Recipe());
+  runApp(WishList());
 }
 
-class Recipe extends StatefulWidget {
+class WishList extends StatefulWidget {
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   @override
-  _RecipeState createState() => _RecipeState();
+  _WishListState createState() => _WishListState();
 }
 
-class _RecipeState extends State<Recipe> {
+class _WishListState extends State<WishList> {
   bool _apiCalled = false;
   bool _isSearched = true;
   bool _noResultsFound = false;
-  final store = LocalStorage("recipes");
+  final store = LocalStorage("wishlist");
+  final store2 = LocalStorage("recipes");
   final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
-  _RecipeState() {
+  _WishListState() {
     _searchController.addListener(() {
       if (_searchController.text.isEmpty) {
         setState(() {
@@ -46,44 +47,41 @@ class _RecipeState extends State<Recipe> {
     color: Colors.black,
   );
   Widget _appBarTitle = new Text(
-    "Recipes",
+    "WishList",
     style: TextStyle(
       color: Colors.black,
       fontSize: 25,
     ),
   );
-  var recipes;
+  var wishList;
 
   @override
   void initState() {
     super.initState();
     setState(() {
       _getRecipes();
+      // wishList = store.getItem('wishlistJSON');
       _searchedRecipes();
-      recipes = store.getItem('recipeJSON');
     });
   }
 
   void _getRecipes() async {
-    final token = store.getItem('userToken');
+    final token = store2.getItem('userToken');
     final res1 = await http.get(
-        "http://35.160.197.175:3006/api/v1/recipe/feeds",
+        "http://35.160.197.175:3006/api/v1/recipe/cooking-list",
         headers: {HttpHeaders.authorizationHeader: token});
-    final jsonResponse = jsonDecode(res1.body);
-    store.setItem('recipeJSON', jsonResponse);
-    if (this.mounted) {
-      setState(() {
-        _apiCalled = true;
-      });
-    }
+    final responseJSON = jsonDecode(res1.body);
+    setState(() {
+      _apiCalled = true;
+      wishList = responseJSON;
+      print(responseJSON);
+    });
   }
 
   void _searchedRecipes() async {
-    if (this.mounted) {
-      setState(() {
-        _isSearched = false;
-      });
-    }
+    setState(() {
+      _isSearched = false;
+    });
     final _api =
         "http://35.160.197.175:3006/api/v1/recipe/feeds?q=" + _searchText;
     final token = store.getItem('userToken');
@@ -91,17 +89,15 @@ class _RecipeState extends State<Recipe> {
         await http.get(_api, headers: {HttpHeaders.authorizationHeader: token});
     final jsonResponse = jsonDecode(res1.body);
     store.setItem('searchedJSON', jsonResponse);
-    if (this.mounted) {
-      setState(() {
-        if (jsonResponse.length == 0) {
-          _noResultsFound = true;
-        } else {
-          recipes = store.getItem('searchedJSON');
-          _isSearched = true;
-          _noResultsFound = false;
-        }
-      });
-    }
+    setState(() {
+      if (jsonResponse.length == 0) {
+        _noResultsFound = true;
+      } else {
+        wishList = store.getItem('searchedJSON');
+        _isSearched = true;
+        _noResultsFound = false;
+      }
+    });
   }
 
   void _searchPressed() async {
@@ -121,20 +117,20 @@ class _RecipeState extends State<Recipe> {
               hintText: 'Search...'),
         );
         setState(() {
-          recipes = store.getItem('searchedJSON');
+          wishList = store.getItem('searchedJSON');
         });
       } else {
         setState(() {
           _isSearched = true;
           _noResultsFound = false;
-          recipes = store.getItem('recipeJSON');
+          wishList = store.getItem('wishlistJSON');
         });
         this._searchIcon = new Icon(
           Icons.search,
           color: Colors.black,
         );
         this._appBarTitle = new Text(
-          "Recipes",
+          "WishList",
           style: TextStyle(
             color: Colors.black,
             fontSize: 25,
@@ -152,18 +148,6 @@ class _RecipeState extends State<Recipe> {
       home: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: FlatButton(
-            color: Colors.white,
-            child: Icon(
-              Icons.playlist_add,
-              size: 35,
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) {
-                return AddNewRecipe();
-              }));
-            },
-          ),
           title: _appBarTitle,
           backgroundColor: Colors.white,
           actions: <Widget>[
@@ -191,7 +175,7 @@ class _RecipeState extends State<Recipe> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    itemCount: recipes.length,
+                    itemCount: wishList.length,
                     itemBuilder: (BuildContext context, int index) {
                       return FlatButton(
                         child: Card(
@@ -202,9 +186,9 @@ class _RecipeState extends State<Recipe> {
                                   height: 150,
                                   width: double.infinity,
                                   child: CachedNetworkImage(
-                                    imageUrl: recipes[index]["photo"] == null
+                                    imageUrl: wishList[index]["photo"] == null
                                         ? widget.defaultImage
-                                        : recipes[index]["photo"],
+                                        : wishList[index]["photo"],
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) => Skeleton(
                                       height: 150,
@@ -229,7 +213,7 @@ class _RecipeState extends State<Recipe> {
                                   child: _apiCalled == false
                                       ? Skeleton()
                                       : Text(
-                                          recipes[index]["name"],
+                                          wishList[index]["name"],
                                           textAlign: TextAlign.left,
                                           style: TextStyle(fontSize: 17),
                                         ),
@@ -262,7 +246,7 @@ class _RecipeState extends State<Recipe> {
                                                                     left: 0),
                                                           ),
                                                           Text(
-                                                            recipes[index][
+                                                            wishList[index][
                                                                 "preparationTime"],
                                                             textAlign:
                                                                 TextAlign.left,
@@ -297,7 +281,7 @@ class _RecipeState extends State<Recipe> {
                                                     //       left: 2, right: 5),
                                                     // ),
                                                     Text(
-                                                      recipes[index]
+                                                      wishList[index]
                                                           ["complexity"],
                                                       textAlign: TextAlign.left,
                                                       style: TextStyle(
@@ -329,7 +313,7 @@ class _RecipeState extends State<Recipe> {
                                                   //   padding: EdgeInsets.only(left: 5),
                                                   // ),
                                                   Text(
-                                                    recipes[index]["serves"],
+                                                    wishList[index]["serves"],
                                                     textAlign: TextAlign.left,
                                                     style: TextStyle(
                                                       fontSize: 14,
@@ -346,7 +330,7 @@ class _RecipeState extends State<Recipe> {
                             )),
                         onPressed: () {
                           store.setItem(
-                              'currentID', recipes[index]["recipeId"]);
+                              'currentID', wishList[index]["recipeId"]);
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) {
                             return RecipeDetails();
