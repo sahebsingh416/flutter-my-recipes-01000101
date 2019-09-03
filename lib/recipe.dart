@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_my_recipes_01000101/addnew.dart';
-import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipedetails.dart';
 import 'package:localstorage/localstorage.dart';
 import './Skeleton.dart';
@@ -237,11 +236,13 @@ class _RecipeState extends State<Recipe> {
                                 Container(
                                   margin: EdgeInsets.only(top: 20, bottom: 20),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Row(children: <Widget>[
-                                        // Padding(
-                                        //   padding: EdgeInsets.only(left: 15),
-                                        // ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 8),
+                                        ),
                                         _apiCalled == false
                                             ? Skeleton(
                                                 width: 80,
@@ -259,7 +260,7 @@ class _RecipeState extends State<Recipe> {
                                                           Padding(
                                                             padding:
                                                                 EdgeInsets.only(
-                                                                    left: 0),
+                                                                    right: 5),
                                                           ),
                                                           Text(
                                                             recipes[index][
@@ -275,70 +276,93 @@ class _RecipeState extends State<Recipe> {
                                                         ],
                                                       ))
                                       ]),
-                                      Row(children: <Widget>[
-                                        // Padding(
-                                        //   padding: EdgeInsets.only(left: 2, right: 4),
-                                        // ),
-                                        _apiCalled == false
-                                            ? Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 5),
-                                                child: Skeleton(width: 80))
-                                            : Container(
-                                                width: 90,
-                                                child: Row(
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      Icons.view_list,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    // Padding(
-                                                    //   padding: EdgeInsets.only(
-                                                    //       left: 2, right: 5),
-                                                    // ),
-                                                    Text(
-                                                      recipes[index]
-                                                          ["complexity"],
-                                                      textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
+                                      Row(
+                                        children: <Widget>[
+                                          // Padding(
+                                          //   padding: EdgeInsets.only(left: 2, right: 4),
+                                          // ),
+                                          _apiCalled == false
+                                              ? Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Skeleton(width: 80))
+                                              : Container(
+                                                  width: 90,
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        Icons.view_list,
                                                         color: Colors.grey,
                                                       ),
-                                                    ),
-                                                  ],
-                                                ))
-                                      ]),
-                                      Row(children: <Widget>[
-                                        // Padding(
-                                        //   padding: EdgeInsets.only(left: 0),
-                                        // ),
-                                        _apiCalled == false
-                                            ? Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 5),
-                                                child: Skeleton(width: 80))
-                                            : Container(
-                                                child: Row(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.restaurant,
-                                                    color: Colors.grey,
-                                                    size: 18,
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 5),
+                                                      ),
+                                                      Text(
+                                                        recipes[index]
+                                                            ["complexity"],
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  // Padding(
-                                                  //   padding: EdgeInsets.only(left: 5),
-                                                  // ),
-                                                  Text(
-                                                    recipes[index]["serves"],
-                                                    textAlign: TextAlign.left,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.grey,
-                                                    ),
+                                                )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(right: 8),
+                                          ),
+                                          _apiCalled == false
+                                              ? Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Skeleton(width: 80))
+                                              : Container(
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        Icons.restaurant,
+                                                        color: Colors.grey,
+                                                        size: 18,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 5),
+                                                      ),
+                                                      Text(
+                                                        recipes[index]
+                                                            ["serves"],
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 8),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ))
-                                      ]),
+                                                )
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),

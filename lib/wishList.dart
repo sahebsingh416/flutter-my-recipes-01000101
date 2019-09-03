@@ -1,7 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_my_recipes_01000101/addnew.dart';
-import 'package:flutter_my_recipes_01000101/loginScreen.dart';
 import './recipedetails.dart';
 import 'package:localstorage/localstorage.dart';
 import './Skeleton.dart';
@@ -154,12 +152,12 @@ class _WishListState extends State<WishList> {
         appBar: AppBar(
           title: _appBarTitle,
           backgroundColor: Colors.white,
-          actions: <Widget>[
-            IconButton(
-              icon: _searchIcon,
-              onPressed: _searchPressed,
-            ),
-          ],
+          // actions: <Widget>[
+          //   IconButton(
+          //     icon: _searchIcon,
+          //     onPressed: _searchPressed,
+          //   ),
+          // ],
         ),
         body: _isSearched == false
             ? (_noResultsFound == false
@@ -225,11 +223,13 @@ class _WishListState extends State<WishList> {
                                 Container(
                                   margin: EdgeInsets.only(top: 20, bottom: 20),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Row(children: <Widget>[
-                                        // Padding(
-                                        //   padding: EdgeInsets.only(left: 15),
-                                        // ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 8),
+                                        ),
                                         _apiCalled == false
                                             ? Skeleton(
                                                 width: 80,
@@ -247,7 +247,7 @@ class _WishListState extends State<WishList> {
                                                           Padding(
                                                             padding:
                                                                 EdgeInsets.only(
-                                                                    left: 0),
+                                                                    right: 5),
                                                           ),
                                                           Text(
                                                             wishList[index][
@@ -280,10 +280,10 @@ class _WishListState extends State<WishList> {
                                                       Icons.view_list,
                                                       color: Colors.grey,
                                                     ),
-                                                    // Padding(
-                                                    //   padding: EdgeInsets.only(
-                                                    //       left: 2, right: 5),
-                                                    // ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          right: 5),
+                                                    ),
                                                     Text(
                                                       wishList[index]
                                                           ["complexity"],
@@ -313,9 +313,10 @@ class _WishListState extends State<WishList> {
                                                     color: Colors.grey,
                                                     size: 18,
                                                   ),
-                                                  // Padding(
-                                                  //   padding: EdgeInsets.only(left: 5),
-                                                  // ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: 5),
+                                                  ),
                                                   Text(
                                                     wishList[index]["serves"],
                                                     textAlign: TextAlign.left,
@@ -323,6 +324,10 @@ class _WishListState extends State<WishList> {
                                                       fontSize: 14,
                                                       color: Colors.grey,
                                                     ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: 8),
                                                   ),
                                                 ],
                                               ))

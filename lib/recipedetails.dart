@@ -73,31 +73,41 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     final token = store.getItem('userToken');
     final req = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list",
-        headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
-        body: {"recipeId": currentRecipeId.toString()});
-        print(req.statusCode);
-        print(jsonDecode(req.body));
-        setState(() {
-         _favIcon = Icon(
-          Icons.favorite,
-          color: Colors.red,
-        ); 
+        headers: {
+          HttpHeaders.authorizationHeader:
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"
+        },
+        body: {
+          "recipeId": currentRecipeId.toString()
         });
+    print(req.statusCode);
+    print(jsonDecode(req.body));
+    setState(() {
+      _favIcon = Icon(
+        Icons.favorite,
+        color: Colors.red,
+      );
+    });
   }
 
   void _removedFromFavorite() async {
     final token = store.getItem('userToken');
     final req = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list",
-        headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
-        body: {"recipeId": currentRecipeId.toString()});
-        print(req.statusCode);
-        setState(() {
-           _favIcon = Icon(
-          Icons.favorite_border,
-          color: Colors.white,
-        ); 
+        headers: {
+          HttpHeaders.authorizationHeader:
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"
+        },
+        body: {
+          "recipeId": currentRecipeId.toString()
         });
+    print(req.statusCode);
+    setState(() {
+      _favIcon = Icon(
+        Icons.favorite_border,
+        color: Colors.white,
+      );
+    });
   }
 
   @override
@@ -144,15 +154,18 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 new Positioned(
                   top: 10,
                   right: 10,
-                  child: IconButton(icon: _favIcon, onPressed: (){
-                    if(_favIcon.icon == Icons.favorite){
-                      _removedFromFavorite();
-                    }else{
-                      _addedInFavorite();
-                    }
-                  },
-                ),
-                )],
+                  child: IconButton(
+                    icon: _favIcon,
+                    onPressed: () {
+                      if (_favIcon.icon == Icons.favorite) {
+                        _removedFromFavorite();
+                      } else {
+                        _addedInFavorite();
+                      }
+                    },
+                  ),
+                )
+              ],
             ),
             Card(
               child: Column(
@@ -176,10 +189,11 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   Container(
                     margin: EdgeInsets.only(top: 20, bottom: 20),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Row(children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(left: 15),
+                            padding: EdgeInsets.only(left: 8),
                           ),
                           Container(
                               width: 100,
@@ -190,7 +204,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     color: Colors.grey,
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(left: 1),
+                                    padding: EdgeInsets.only(right: 5),
                                   ),
                                   Text(
                                     recipes[recipeIndex]["preparationTime"],
@@ -216,7 +230,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     color: Colors.grey,
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(left: 6, right: 1),
+                                    padding: EdgeInsets.only(right: 5),
                                   ),
                                   Text(
                                     recipes[recipeIndex]["complexity"],
@@ -231,7 +245,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                         ]),
                         Row(children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(left: 2),
+                            padding: EdgeInsets.only(right: 8),
                           ),
                           Container(
                               child: Row(
@@ -241,7 +255,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                 color: Colors.grey,
                               ),
                               Padding(
-                                padding: EdgeInsets.only(left: 5),
+                                padding: EdgeInsets.only(right: 5),
                               ),
                               Text(
                                 recipes[recipeIndex]["serves"],
@@ -250,6 +264,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                   fontSize: 14,
                                   color: Colors.grey,
                                 ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(right: 8),
                               ),
                             ],
                           ))
