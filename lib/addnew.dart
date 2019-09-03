@@ -47,7 +47,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
 
   void _addRecipe() {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-                return Recipe();
+                return Recipe();          
               }));
   }
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
@@ -24,6 +25,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   void initState() {
     super.initState();
     currentRecipeId = store.getItem('currentID');
+    print(currentRecipeId);
     ingredients = store.getItem('ingredientsJSON');
     recipes = store.getItem('recipeJSON');
     for (int i = 0; i < recipes.length; i++) {
@@ -72,8 +74,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     final req = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list",
         headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
-        body: {"recipeId": recipeIndex.toString()});
-        
+        body: {"recipeId": currentRecipeId.toString()});
+        print(req.statusCode);
+        print(jsonDecode(req.body));
         setState(() {
          _favIcon = Icon(
           Icons.favorite,
@@ -87,7 +90,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     final req = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list",
         headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
-        body: {"recipeId": recipeIndex.toString()});
+        body: {"recipeId": currentRecipeId.toString()});
         print(req.statusCode);
         setState(() {
            _favIcon = Icon(
