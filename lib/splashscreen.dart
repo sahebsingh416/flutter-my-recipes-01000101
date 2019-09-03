@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_my_recipes_01000101/recipe.dart';
 import 'dart:async';
 import './loginScreen.dart';
 import './profile.dart';
+import 'package:localstorage/localstorage.dart';
+import './tabbar.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -9,6 +12,15 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final store = LocalStorage("recipes");
+  var _userLoggedIn;
+  @override
+  void setState(fn) {
+    // TODO: implement setState
+    super.setState(fn);
+    _userLoggedIn = store.getItem('isLoggedIn');
+    print(_userLoggedIn);
+  }
   @override
   void initState() {
     super.initState();
@@ -16,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Duration(seconds: 2),
         () =>
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-              return Login();
+              return  Login();
             })));
   }
 

@@ -15,6 +15,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool _apiCalled = false;
+  bool _userLoggedIn = false;
   var fullname;
   var email;
   final store = LocalStorage('recipes');
@@ -47,6 +48,7 @@ class _LoginState extends State<Login> {
   void _onLogin() async {
     setState(() {
       _apiCalled = true;
+      _userLoggedIn = true;
     });
     final login = await http
         .post("http://35.160.197.175:3006/api/v1/user/login", body: {
@@ -56,6 +58,8 @@ class _LoginState extends State<Login> {
     if (login.statusCode == 400) {
       setState(() {
         _apiCalled = false;
+        _userLoggedIn = false;
+        store.setItem('isLoggedIn', _userLoggedIn);
       });
       showDialog(
           context: context,
@@ -71,6 +75,8 @@ class _LoginState extends State<Login> {
       store.setItem('email', email);
       final token = loginJSON["token"];
       store.setItem('userToken', token);
+      store.setItem('isLoggedIn', _userLoggedIn);
+      
       //var jsonResponse;
       // final res2 = await http.get(
       //     "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",

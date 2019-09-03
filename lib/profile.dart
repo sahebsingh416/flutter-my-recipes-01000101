@@ -49,6 +49,9 @@ class _ProfileState extends State<Profile> {
               size: 25,
             ),
             onPressed: () {
+              setState(() {
+                store.setItem('isLoggedIn', false);
+              });
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (_) {
                 return Login();

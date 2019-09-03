@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -27,27 +29,72 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     for (int i = 0; i < recipes.length; i++) {
       if (currentRecipeId == recipes[i]["recipeId"]) {
         recipeIndex = i;
-        if(recipes[i]["inCookingList"]==1){
-          _favIcon = Icon(Icons.favorite,color: Colors.red,);
-        }else{
-          _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
+        if (recipes[i]["inCookingList"] == 1) {
+          _favIcon = Icon(
+            Icons.favorite,
+            color: Colors.red,
+          );
+        } else {
+          _favIcon = Icon(
+            Icons.favorite_border,
+            color: Colors.white,
+          );
         }
       }
     }
     instructions = store.getItem('instructionsJSON');
   }
-  void _backToRecipes(){
+
+  void _backToRecipes() {
     Navigator.pop(context);
   }
 
-  void _addToFavorite(){
+  void _addToFavorite() {
     setState(() {
-      if(_favIcon.icon == Icons.favorite){
-        _favIcon = Icon(Icons.favorite_border,color: Colors.white,);
-      }else{
-        _favIcon = Icon(Icons.favorite,color: Colors.red,);
+      if (_favIcon.icon == Icons.favorite) {
+        _favIcon = Icon(
+          Icons.favorite_border,
+          color: Colors.white,
+        );
+        _removedFromFavorite();
+      } else {
+        _addedInFavorite();
+        _favIcon = Icon(
+          Icons.favorite,
+          color: Colors.red,
+        );
       }
     });
+  }
+
+  void _addedInFavorite() async {
+    final token = store.getItem('userToken');
+    final req = await http.post(
+        "http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list",
+        headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
+        body: {"recipeId": recipeIndex.toString()});
+        
+        setState(() {
+         _favIcon = Icon(
+          Icons.favorite,
+          color: Colors.red,
+        ); 
+        });
+  }
+
+  void _removedFromFavorite() async {
+    final token = store.getItem('userToken');
+    final req = await http.post(
+        "http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list",
+        headers: {HttpHeaders.authorizationHeader: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"},
+        body: {"recipeId": recipeIndex.toString()});
+        print(req.statusCode);
+        setState(() {
+           _favIcon = Icon(
+          Icons.favorite_border,
+          color: Colors.white,
+        ); 
+        });
   }
 
   @override
@@ -94,12 +141,15 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 new Positioned(
                   top: 10,
                   right: 10,
-                  child: IconButton(
-                    icon: _favIcon,
-                    onPressed: _addToFavorite
-                  ),
+                  child: IconButton(icon: _favIcon, onPressed: (){
+                    if(_favIcon.icon == Icons.favorite){
+                      _removedFromFavorite();
+                    }else{
+                      _addedInFavorite();
+                    }
+                  },
                 ),
-              ],
+                )],
             ),
             Card(
               child: Column(
