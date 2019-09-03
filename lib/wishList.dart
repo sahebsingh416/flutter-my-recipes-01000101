@@ -71,11 +71,13 @@ class _WishListState extends State<WishList> {
         "http://35.160.197.175:3006/api/v1/recipe/cooking-list",
         headers: {HttpHeaders.authorizationHeader: token});
     final responseJSON = jsonDecode(res1.body);
-    setState(() {
-      _apiCalled = true;
-      wishList = responseJSON;
-      print(responseJSON);
-    });
+    if (this.mounted) {
+      setState(() {
+        _apiCalled = true;
+        wishList = responseJSON;
+        print(responseJSON);
+      });
+    }
   }
 
   void _searchedRecipes() async {
@@ -89,15 +91,17 @@ class _WishListState extends State<WishList> {
         await http.get(_api, headers: {HttpHeaders.authorizationHeader: token});
     final jsonResponse = jsonDecode(res1.body);
     store.setItem('searchedJSON', jsonResponse);
-    setState(() {
-      if (jsonResponse.length == 0) {
-        _noResultsFound = true;
-      } else {
-        wishList = store.getItem('searchedJSON');
-        _isSearched = true;
-        _noResultsFound = false;
-      }
-    });
+    if (this.mounted) {
+      setState(() {
+        if (jsonResponse.length == 0) {
+          _noResultsFound = true;
+        } else {
+          wishList = store.getItem('searchedJSON');
+          _isSearched = true;
+          _noResultsFound = false;
+        }
+      });
+    }
   }
 
   void _searchPressed() async {
