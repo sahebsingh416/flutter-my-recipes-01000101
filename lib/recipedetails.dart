@@ -17,6 +17,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   var ingredients;
   var instructions;
   var recipes;
+  bool videoUrl = false;
   Icon _favIcon;
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
@@ -134,7 +135,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           children: <Widget>[
             Stack(
               alignment: Alignment(0.0, -1.0),
-              children: <Widget>[
+              children: <Widget>[ videoUrl == false ?
                 CachedNetworkImage(
                   height: 250,
                   width: double.maxFinite,
@@ -150,6 +151,43 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                           backgroundColor: Colors.transparent,
                         )),
                   ),
+                ) : Stack(
+                  alignment: Alignment(0.0, -1.0),
+              children: <Widget>[ 
+                CachedNetworkImage(
+                  height: 250,
+                  width: double.maxFinite,
+                  imageUrl: recipes[recipeIndex]["photo"] == null
+                      ? defaultImage
+                      : recipes[recipeIndex]["photo"],
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(
+                    child: Container(
+                        height: 30,
+                        width: 30,
+                        child: new CircularProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                        )),
+                  ),
+                ),
+                new Positioned(
+                  top: 100,
+                   child: Center(
+                     child: IconButton(
+                      icon: Image.asset('images/youtube.png'), 
+                      // icon: Icon(Icons.play_arrow),
+                      iconSize: 50,
+                      onPressed: () {
+                        // if (_favIcon.icon == Icons.favorite) {
+                        //   _removedFromFavorite();
+                        // } else {
+                        //   _addedInFavorite();
+                        // }
+                      },
+                  ),
+                   ),
+                )
+              ],
                 ),
                 new Positioned(
                   top: 10,
@@ -196,7 +234,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                             padding: EdgeInsets.only(left: 8),
                           ),
                           Container(
-                              width: 100,
+                              width: 120,
                               child: Row(
                                 children: <Widget>[
                                   Icon(

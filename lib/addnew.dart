@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_my_recipes_01000101/recipe.dart';
+import './tabbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:localstorage/localstorage.dart';
 import 'dart:async';
@@ -46,9 +46,10 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   }
 
   void _addRecipe() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-                return Recipe();          
-              }));
+    Navigator.pop(context);
+    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
+    //             return Tabbar();          
+    //           }));
   }
 
   void _checkFields() {
