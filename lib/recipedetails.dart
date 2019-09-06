@@ -5,6 +5,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'package:video_player/video_player.dart';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -17,14 +18,31 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   var ingredients;
   var instructions;
   var recipes;
-  bool videoUrl = false;
+  bool videoUrl = true;
   Icon _favIcon;
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   final store = LocalStorage('recipes');
+  VideoPlayerController _controller;
+  bool _isPlaying = false;
+
   @override
   void initState() {
     super.initState();
+    _controller = VideoPlayerController.network("https://www.youtube.com/watch?v=heku_-RWxLY");
+    _controller.addListener((){
+      final bool isPlaying = _controller.value.isPlaying;
+      if(isPlaying != _isPlaying){
+        setState(() {
+          _isPlaying = isPlaying;
+        });
+      }
+    });
+    _controller.initialize().then((_){
+      setState(() {
+        
+      });
+    });
     currentRecipeId = store.getItem('currentID');
     print(currentRecipeId);
     ingredients = store.getItem('ingredientsJSON');
@@ -175,14 +193,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                    child: Center(
                      child: IconButton(
                       icon: Image.asset('images/youtube.png'), 
-                      // icon: Icon(Icons.play_arrow),
                       iconSize: 50,
                       onPressed: () {
-                        // if (_favIcon.icon == Icons.favorite) {
-                        //   _removedFromFavorite();
-                        // } else {
-                        //   _addedInFavorite();
-                        // }
+                        _controller.value.isPlaying ? _controller.pause() : _controller.play();
                       },
                   ),
                    ),
@@ -198,7 +211,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       if (_favIcon.icon == Icons.favorite) {
                         _removedFromFavorite();
                       } else {
-                        _addedInFavorite();
+                        _addToFavorite();
                       }
                     },
                   ),
