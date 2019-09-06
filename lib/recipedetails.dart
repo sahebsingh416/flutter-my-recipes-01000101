@@ -172,22 +172,23 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 ) : Stack(
                   alignment: Alignment(0.0, -1.0),
               children: <Widget>[ 
-                CachedNetworkImage(
-                  height: 250,
-                  width: double.maxFinite,
-                  imageUrl: recipes[recipeIndex]["photo"] == null
-                      ? defaultImage
-                      : recipes[recipeIndex]["photo"],
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Center(
-                    child: Container(
-                        height: 30,
-                        width: 30,
-                        child: new CircularProgressIndicator(
-                          backgroundColor: Colors.transparent,
-                        )),
-                  ),
-                ),
+                // CachedNetworkImage(
+                //   height: 250,
+                //   width: double.maxFinite,
+                //   imageUrl: recipes[recipeIndex]["photo"] == null
+                //       ? defaultImage
+                //       : recipes[recipeIndex]["photo"],
+                //   fit: BoxFit.cover,
+                //   placeholder: (context, url) => Center(
+                //     child: Container(
+                //         height: 30,
+                //         width: 30,
+                //         child: new CircularProgressIndicator(
+                //           backgroundColor: Colors.transparent,
+                //         )),
+                //   ),
+                // ),
+                VideoPlayer(_controller),
                 new Positioned(
                   top: 100,
                    child: Center(
