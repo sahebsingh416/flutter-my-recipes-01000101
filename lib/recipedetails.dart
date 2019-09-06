@@ -5,7 +5,8 @@ import 'package:localstorage/localstorage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'package:video_player/video_player.dart';
+//import 'package:video_player/video_player.dart';
+import 'package:youtube_player/youtube_player.dart';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -23,26 +24,26 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   final store = LocalStorage('recipes');
-  VideoPlayerController _controller;
+  VideoPlayerController _videoController;
   bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network("https://www.youtube.com/watch?v=heku_-RWxLY");
-    _controller.addListener((){
-      final bool isPlaying = _controller.value.isPlaying;
-      if(isPlaying != _isPlaying){
-        setState(() {
-          _isPlaying = isPlaying;
-        });
-      }
-    });
-    _controller.initialize().then((_){
-      setState(() {
-        
-      });
-    });
+//    _controller = VideoPlayerController.network("https://www.youtube.com/watch?v=-liJSfU5yBk");
+//    _controller.addListener((){
+//      final bool isPlaying = _controller.value.isPlaying;
+//      if(isPlaying != _isPlaying){
+//        setState(() {
+//          _isPlaying = isPlaying;
+//        });
+//      }
+//    });
+//    _controller.initialize().then((_){
+//      setState(() {
+//
+//      });
+//    });
     currentRecipeId = store.getItem('currentID');
     print(currentRecipeId);
     ingredients = store.getItem('ingredientsJSON');
@@ -171,7 +172,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   ),
                 ) : Stack(
                   alignment: Alignment(0.0, -1.0),
-              children: <Widget>[ 
+              children: <Widget>[
                 // CachedNetworkImage(
                 //   height: 250,
                 //   width: double.maxFinite,
@@ -188,15 +189,29 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 //         )),
                 //   ),
                 // ),
-                VideoPlayer(_controller),
+//                VideoPlayer(_controller),
+                YoutubePlayer(
+                  context: context,
+                  controlsColor: ControlsColor(buttonColor: Colors.amber,playPauseColor: Colors.red,progressBarBackgroundColor: Colors.pink,seekBarPlayedColor: Colors.white),
+                  source: "-liJSfU5yBk&list=RD-liJSfU5yBk&start_radio=1&t=1528",
+                  quality: YoutubeQuality.MEDIUM,
+                  loop: true,
+                  autoPlay: true,
+                  keepScreenOn: false,
+                  // callbackController is (optional).
+                  // use it to control player on your own.
+                  callbackController: (controller) {
+                    _videoController = controller;
+                  },
+                ),
                 new Positioned(
                   top: 100,
                    child: Center(
                      child: IconButton(
-                      icon: Image.asset('images/youtube.png'), 
+                      icon: Image.asset('images/youtube.png'),
                       iconSize: 50,
                       onPressed: () {
-                        _controller.value.isPlaying ? _controller.pause() : _controller.play();
+//                        _controller.value.isPlaying ? _controller.pause() : _controller.play();
                       },
                   ),
                    ),
