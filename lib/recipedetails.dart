@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 //import 'package:video_player/video_player.dart';
 import 'package:youtube_player/youtube_player.dart';
+import 'package:share/share.dart';
 
 class RecipeDetails extends StatefulWidget {
   @override
@@ -140,6 +141,14 @@ class _RecipeDetailsState extends State<RecipeDetails> {
             child: Icon(Icons.arrow_back_ios),
             onPressed: _backToRecipes,
           ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.share,color: Colors.black,),
+              onPressed: (){
+                Share.share("");
+              },
+            ),
+          ],
           title: Text(
             "Recipes Details",
             style: TextStyle(

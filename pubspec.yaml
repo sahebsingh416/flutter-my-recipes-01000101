@@ -29,6 +29,7 @@ dependencies:
   cached_network_image: ^1.1.1
   video_player: ^0.10.2+1
   youtube_player: ^3.5.0
+  share: ^0.6.2+1
   # speech_recognition: "^0.3.0"
 
 dev_dependencies:
