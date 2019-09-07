@@ -143,9 +143,12 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.share,color: Colors.black,),
-              onPressed: (){
-                Share.share("");
+              icon: Icon(
+                Icons.share,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                Share.share("Hello Saheb Here!");
               },
             ),
           ],
@@ -163,84 +166,90 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           children: <Widget>[
             Stack(
               alignment: Alignment(0.0, -1.0),
-              children: <Widget>[ videoUrl == false ?
-                CachedNetworkImage(
-                  height: 250,
-                  width: double.maxFinite,
-                  imageUrl: recipes[recipeIndex]["photo"] == null
-                      ? defaultImage
-                      : recipes[recipeIndex]["photo"],
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Center(
-                    child: Container(
-                        height: 30,
-                        width: 30,
-                        child: new CircularProgressIndicator(
-                          backgroundColor: Colors.transparent,
-                        )),
-                  ),
-                ) : Stack(
-                  alignment: Alignment(0.0, -1.0),
               children: <Widget>[
-                // CachedNetworkImage(
-                //   height: 250,
-                //   width: double.maxFinite,
-                //   imageUrl: recipes[recipeIndex]["photo"] == null
-                //       ? defaultImage
-                //       : recipes[recipeIndex]["photo"],
-                //   fit: BoxFit.cover,
-                //   placeholder: (context, url) => Center(
-                //     child: Container(
-                //         height: 30,
-                //         width: 30,
-                //         child: new CircularProgressIndicator(
-                //           backgroundColor: Colors.transparent,
-                //         )),
-                //   ),
-                // ),
-//                VideoPlayer(_controller),
-                YoutubePlayer(
-                  context: context,
-                  controlsColor: ControlsColor(buttonColor: Colors.amber,playPauseColor: Colors.red,progressBarBackgroundColor: Colors.pink,seekBarPlayedColor: Colors.white),
-                  source: "-liJSfU5yBk&list=RD-liJSfU5yBk&start_radio=1&t=1528",
-                  quality: YoutubeQuality.MEDIUM,
-                  loop: true,
-                  autoPlay: true,
-                  keepScreenOn: false,
-                  // callbackController is (optional).
-                  // use it to control player on your own.
-                  callbackController: (controller) {
-                    _videoController = controller;
-                  },
-                ),
-                new Positioned(
-                  top: 100,
-                   child: Center(
-                     child: IconButton(
-                      icon: Image.asset('images/youtube.png'),
-                      iconSize: 50,
-                      onPressed: () {
-//                        _controller.value.isPlaying ? _controller.pause() : _controller.play();
-                      },
-                  ),
-                   ),
-                )
-              ],
-                ),
-                new Positioned(
-                  top: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: _favIcon,
-                    onPressed: () {
-                      if (_favIcon.icon == Icons.favorite) {
-                        _removedFromFavorite();
-                      } else {
-                        _addToFavorite();
-                      }
-                    },
-                  ),
-                )
+                _isPlaying == false
+                    ? CachedNetworkImage(
+                        height: 250,
+                        width: double.maxFinite,
+                        imageUrl: recipes[recipeIndex]["photo"] == null
+                            ? defaultImage
+                            : recipes[recipeIndex]["photo"],
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: Container(
+                              height: 30,
+                              width: 30,
+                              child: new CircularProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                              )),
+                        ),
+                      )
+                    : Container(
+                        height: 250,
+                        width: double.maxFinite,
+                        child: YoutubePlayer(
+                          context: context,
+                          controlsColor: ControlsColor(
+                              buttonColor: Colors.amber,
+                              playPauseColor: Colors.red,
+                              progressBarBackgroundColor: Colors.pink,
+                              seekBarPlayedColor: Colors.white),
+                          source:
+                              "loLfq8JvNAo",
+                          quality: YoutubeQuality.MEDIUM,
+                          autoPlay: true,
+                          keepScreenOn: true,
+                          // callbackController is (optional).
+                          // use it to control player on your own.
+                          callbackController: (controller) {
+                            _videoController = controller;
+                            // _isPlaying = true;
+                          },
+                        ),
+                      ),
+                _isPlaying == false
+                    ? new Positioned(
+                        top: 100,
+                        child: Center(
+                          child: IconButton(
+                            icon: Image.asset('images/youtube.png'),
+                            iconSize: 50,
+                            onPressed: () {
+                              setState(() {
+                                _isPlaying = true;
+                              });
+                            },
+                          ),
+                        ),
+                      )
+                    : Text(""),
+                _isPlaying == false
+                    ? new Positioned(
+                        top: 10,
+                        right: 10,
+                        child: IconButton(
+                          icon: _favIcon,
+                          onPressed: () {
+                            if (_favIcon.icon == Icons.favorite) {
+                              _removedFromFavorite();
+                            } else {
+                              _addToFavorite();
+                            }
+                          },
+                        ),
+                      )
+                    : new Positioned(
+                        top: 10,
+                        left: 10,
+                        child: IconButton(
+                          icon: Icon(Icons.cancel,color: Colors.white,),
+                          onPressed: () {
+                            setState(() {
+                             _isPlaying = false; 
+                            });
+                          },
+                        ),
+                      ),
               ],
             ),
             Card(

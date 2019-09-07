@@ -55,7 +55,6 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       url = _textFieldController.text;
       _textFieldController.clear();
     });
-    print(url);
   }
 
   void _addRecipe() {
@@ -445,7 +444,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                           alignment: Alignment(-0.95, 0.0),
                           margin: EdgeInsets.only(left: 5, top: 20),
                           child: Text(
-                            "Upload Image / Add URL",
+                            "Add Image / Add URL",
                             textAlign: TextAlign.left,
                             style: TextStyle(
                               fontSize: 20,
@@ -454,13 +453,71 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                             ),
                           )),
                       Container(
-                        margin: EdgeInsets.only(top: 15, left: 15, right: 15),
-                        child: _image == null
+                        margin: EdgeInsets.only(top: 25, left: 15, right: 15),
+                        child: Column(
+                          children: <Widget>[
+                            _image == null
                             ? Container(
                                 height: 0,
                                 width: 0,
                               )
-                            : Container(child: Image.file(_image)),
+                            : Container(child: Stack(
+                              children: <Widget>[
+                                new Positioned(                              
+                                  child: Image.file(_image),
+                                ),
+                                new Positioned(
+                                  right: 0,
+                                  child: IconButton(
+                                  icon: Icon(Icons.cancel,color: Colors.orange,),
+                                  onPressed: (){
+                                    setState(() {
+                                      _image = null;
+                                    });
+                                  },
+                                ),
+                                ),
+                              ],
+                            )),
+                            Padding(
+                              padding: EdgeInsets.only(top: 25),
+                            ),
+                             url == null
+                            ? Container(
+                                height: 0,
+                                width: 0,
+                              )
+                            : Container(child: Stack(
+                              children: <Widget>[
+                                new Positioned(                              
+                                  child: Container(
+                                    
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(25.0)
+                                    ),
+                                      border: Border.all(color: Colors.orangeAccent)
+                                    ),
+                                    child: Center(child: Text(url)),
+                                  ),
+                                ),
+                                new Positioned(
+                                  right: 0,
+                                  child: IconButton(
+                                  icon: Icon(Icons.cancel,color: Colors.orange,),
+                                  onPressed: (){
+                                    setState(() {
+                                      _image = null;
+                                    });
+                                  },
+                                ),
+                                ),
+                              ],
+                            )),
+                          ],
+                        )
                       ),
                       Container(
                         child: Row(
@@ -550,7 +607,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                 child: RaisedButton(
                                   color: Colors.orange,
                                   child: Text(
-                                    "Browse",
+                                    "Add Image",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   onPressed: _getImageFromGallery,
@@ -568,6 +625,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                     minWidth: double.maxFinite,
                     height: 44,
                     child: RaisedButton(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)) ,
                         color: Colors.orange,
                         child: Text(
                           "Submit",
