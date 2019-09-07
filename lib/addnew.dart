@@ -7,6 +7,7 @@ import 'dart:io';
 import './showdialog.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import './textfield_alert.dart';
 
 class AddNewRecipe extends StatefulWidget {
   @override
@@ -15,12 +16,16 @@ class AddNewRecipe extends StatefulWidget {
 
 class _AddNewRecipeState extends State<AddNewRecipe> {
   final store = LocalStorage('recipes');
+  var _textFieldController = TextEditingController();
   var _recipeNameController = TextEditingController();
   var _recipeDurationController = TextEditingController();
   var _recipeServesController = TextEditingController();
   var _ingredientName = TextEditingController();
   var _ingredientQuant = TextEditingController();
   var _instructionController = TextEditingController();
+  var url;
+  final _formkey = GlobalKey<FormState>();
+  bool _autoValidate = false;
   String _dropDownType;
   String _dropDownComplexity;
   bool _isValid = false;
@@ -45,10 +50,19 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     });
   }
 
+  void _storeURL() {
+    setState(() {
+      url = _textFieldController.text;
+      _textFieldController.clear();
+    });
+    print(url);
+  }
+
   void _addRecipe() {
+    print(url);
     Navigator.pop(context);
     // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-    //             return Tabbar();          
+    //             return Tabbar();
     //           }));
   }
 
@@ -110,8 +124,6 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
         maxWidth: double.maxFinite);
     setState(() {
       _image = picture;
-      print(_image);
-      print(picture.path);
     });
   }
 
@@ -433,7 +445,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                           alignment: Alignment(-0.95, 0.0),
                           margin: EdgeInsets.only(left: 5, top: 20),
                           child: Text(
-                            "Upload Image",
+                            "Upload Image / Add URL",
                             textAlign: TextAlign.left,
                             style: TextStyle(
                               fontSize: 20,
@@ -451,16 +463,101 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                             : Container(child: Image.file(_image)),
                       ),
                       Container(
-                          alignment: Alignment(0.95, 0.0),
-                          margin: EdgeInsets.only(top: 15, bottom: 10),
-                          child: RaisedButton(
-                            color: Colors.orange,
-                            child: Text(
-                              "Browse",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: _getImageFromGallery,
-                          )),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Container(
+                                margin: EdgeInsets.only(
+                                    top: 15, bottom: 10, left: 10),
+                                child: RaisedButton(
+                                  color: Colors.orange,
+                                  child: Text(
+                                    "Add URL",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Add URL'),
+                                            content: Form(
+                                              key: _formkey,
+                                              autovalidate: _autoValidate,
+                                              child: TextFormField(
+                                                validator: (value) {
+                                                  Pattern pattern =
+                                                      r'^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$';
+                                                  RegExp regex =
+                                                      new RegExp(pattern);
+                                                  if (!regex.hasMatch(value))
+                                                    return 'Enter Valid URL';
+                                                  else
+                                                    //_storeURL();
+                                                    return null;
+                                                },
+                                                controller:
+                                                    _textFieldController,
+                                                decoration: InputDecoration(
+                                                    hintText: "Enter your URL",
+                                                    border: UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .orange))),
+                                                cursorColor: Colors.orange,
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              new FlatButton(
+                                                child: new Text(
+                                                  "Add",
+                                                  style: TextStyle(
+                                                      color: Colors.orange),
+                                                ),
+                                                onPressed: () {
+                                                  if (_formkey.currentState
+                                                      .validate()) {
+                                                    _formkey.currentState
+                                                        .save();
+                                                    _storeURL();
+                                                    Navigator.of(context).pop();
+                                                  } else {
+                                                    setState(() {
+                                                      _autoValidate = true;
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                              new FlatButton(
+                                                child: new Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      color: Colors.orange),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                )),
+                            Container(
+                                //alignment: Alignment(0.95, 0.0),
+                                margin: EdgeInsets.only(
+                                    top: 15, bottom: 10, right: 10),
+                                child: RaisedButton(
+                                  color: Colors.orange,
+                                  child: Text(
+                                    "Browse",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  onPressed: _getImageFromGallery,
+                                )),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
