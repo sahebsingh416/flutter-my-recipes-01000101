@@ -491,10 +491,8 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                               children: <Widget>[
                                 new Positioned(                              
                                   child: Container(
-                                    
                                     height: 50,
                                     decoration: BoxDecoration(
-                                      
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(25.0)
                                     ),
@@ -509,7 +507,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                   icon: Icon(Icons.cancel,color: Colors.orange,),
                                   onPressed: (){
                                     setState(() {
-                                      _image = null;
+                                      url = null;
                                     });
                                   },
                                 ),

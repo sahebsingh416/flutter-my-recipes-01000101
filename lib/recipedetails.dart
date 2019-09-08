@@ -148,7 +148,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                 color: Colors.black,
               ),
               onPressed: () {
-                Share.share("Hello Saheb Here!");
+                Share.share("You can see, my receipe!");
               },
             ),
           ],

@@ -7,8 +7,9 @@ import './Skeleton.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-// import 'package:speech_recognition/speech_recognition.dart';
+import 'package:speech_recognition/speech_recognition.dart';
 
+// import 'package:speech_recognition/speech_recognition.dart';
 
 void main() {
   runApp(Recipe());
@@ -28,6 +29,11 @@ class _RecipeState extends State<Recipe> {
   final store = LocalStorage("recipes");
   final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
+  SpeechRecognition _speechRecognition;
+  bool _isAvailable = false;
+  bool _isListening = false;
+  bool _isSearching = false;
+
   _RecipeState() {
     _searchController.addListener(() {
       if (_searchController.text.isEmpty) {
@@ -42,6 +48,7 @@ class _RecipeState extends State<Recipe> {
       }
     });
   }
+
   Icon _searchIcon = new Icon(
     Icons.search,
     color: Colors.black,
@@ -61,8 +68,33 @@ class _RecipeState extends State<Recipe> {
     setState(() {
       _getRecipes();
       _searchedRecipes();
+      initSpeechRecognizer();
       recipes = store.getItem('recipeJSON');
     });
+  }
+
+  void initSpeechRecognizer() {
+    _speechRecognition = SpeechRecognition();
+
+    _speechRecognition.setAvailabilityHandler(
+      (bool result) => setState(() => _isAvailable = result),
+    );
+
+    _speechRecognition.setRecognitionStartedHandler(
+      () => setState(() => _isListening = true),
+    );
+
+    _speechRecognition.setRecognitionResultHandler(
+      (String speech) => setState(() => _searchController.text = speech),
+    );
+
+    _speechRecognition.setRecognitionCompleteHandler(
+      () => setState(() => _isListening = false),
+    );
+
+    _speechRecognition.activate().then(
+          (result) => setState(() => _isAvailable = result),
+        );
   }
 
   void _getRecipes() async {
@@ -113,6 +145,10 @@ class _RecipeState extends State<Recipe> {
           Icons.close,
           color: Colors.black,
         );
+        if (_isListening)
+          _speechRecognition.stop().then(
+                (result) => setState(() => _isListening = result),
+              );
         this._appBarTitle = new TextField(
           controller: _searchController,
           cursorColor: Colors.orange,
@@ -122,12 +158,14 @@ class _RecipeState extends State<Recipe> {
               hintText: 'Search...'),
         );
         setState(() {
+          _isSearching = true;
           recipes = store.getItem('searchedJSON');
         });
       } else {
         setState(() {
           _isSearched = true;
           _noResultsFound = false;
+          _isSearching = false;
           recipes = store.getItem('recipeJSON');
         });
         this._searchIcon = new Icon(
@@ -153,18 +191,33 @@ class _RecipeState extends State<Recipe> {
       home: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: FlatButton(
-            color: Colors.white,
-            child: Icon(
-              Icons.playlist_add,
-              size: 35,
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) {
-                return AddNewRecipe();
-              }));
-            },
-          ),
+          leading: _isSearching == false
+              ? FlatButton(
+                  color: Colors.white,
+                  child: Icon(
+                    Icons.playlist_add,
+                    size: 35,
+                  ),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) {
+                      return AddNewRecipe();
+                    }));
+                  },
+                )
+              : _isListening ? FlatButton(
+                color: Colors.orange,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                child: Icon(Icons.keyboard_voice,color: Colors.white,),
+                onPressed: (){},
+              ) : IconButton(
+                  icon: Icon(Icons.keyboard_voice),
+                  onPressed: () {
+                    if (_isAvailable && !_isListening)
+                      _speechRecognition
+                          .listen(locale: "en_US")
+                          .then((result) => print('$result'));
+                  },
+                ),
           title: _appBarTitle,
           backgroundColor: Colors.white,
           actions: <Widget>[
