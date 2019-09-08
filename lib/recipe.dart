@@ -205,6 +205,7 @@ class _RecipeState extends State<Recipe> {
                   },
                 )
               : _isListening ? FlatButton(
+                
                 color: Colors.orange,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 child: Icon(Icons.keyboard_voice,color: Colors.white,),

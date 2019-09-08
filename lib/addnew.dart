@@ -7,7 +7,6 @@ import 'dart:io';
 import './showdialog.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import './textfield_alert.dart';
 
 class AddNewRecipe extends StatefulWidget {
   @override
@@ -17,6 +16,7 @@ class AddNewRecipe extends StatefulWidget {
 class _AddNewRecipeState extends State<AddNewRecipe> {
   final store = LocalStorage('recipes');
   var _textFieldController = TextEditingController();
+  var _tagController = TextEditingController();
   var _recipeNameController = TextEditingController();
   var _recipeDurationController = TextEditingController();
   var _recipeServesController = TextEditingController();
@@ -32,6 +32,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   File _image;
   List _recipeIngredients = [];
   List _instructionSteps = [];
+  List<String> tags = [];
 
   void _addIngredient() {
     setState(() {
@@ -55,6 +56,13 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       url = _textFieldController.text;
       _textFieldController.clear();
     });
+  }
+
+  void _addTag() {
+    setState(() {
+      tags.add(_tagController.text);
+    });
+    print(tags);
   }
 
   void _addRecipe() {
@@ -167,51 +175,136 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                               ),
                             )),
                         Container(
+                          margin: EdgeInsets.all(0),
                           width: double.maxFinite,
-                          //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          height: 60,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.grey),
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                          ),
-                          margin: EdgeInsets.only(left: 10, right: 10, top: 15),
-                          constraints: BoxConstraints.tightForFinite(),
-                          child: Container(
-                            margin: EdgeInsets.only(
-                              left: 10,
-                            ),
-                            child: Container(
-                              margin: EdgeInsets.all(0),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  hint: Text("Select Type*"),
-                                  value: _dropDownType,
-                                  iconSize: 30,
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  iconDisabledColor: Colors.grey,
-                                  iconEnabledColor: Colors.orange,
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      _dropDownType = newValue;
-                                    });
-                                  },
-                                  items: <String>[
-                                    'Soup',
-                                    'Pasta',
-                                    'Dal',
-                                    'Rice',
-                                    'Noodles',
-                                    'Salad'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
+                          child: Stack(
+                            children: <Widget>[
+                              new Positioned(
+                                child: Container(
+                                  width: double.maxFinite,
+                                  //margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.grey),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)),
+                                  ),
+                                  margin: EdgeInsets.only(
+                                      left: 10, right: 10, top: 15),
+                                  constraints: BoxConstraints.tightForFinite(),
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: 10,
+                                    ),
+                                    child: Container(
+                                      margin: EdgeInsets.only(top: 5),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          new Positioned(
+                                            child: Container(
+                                              margin:
+                                                  EdgeInsets.only(right: 50),
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: tags.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return Container(
+                                                    margin: EdgeInsets.only(left: 5,top: 5,bottom: 8),
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(),
+                                                        borderRadius: BorderRadius.all(Radius.circular(30))
+                                                        ),
+                                                    alignment:
+                                                        Alignment(0.0, -1.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          margin: EdgeInsets.only(left:10),
+                                                            child: Text(
+                                                                tags[index])),
+                                                        Container(
+                                                          child: IconButton(
+                                                            icon: Icon(
+                                                              Icons.close,
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                            onPressed: (){
+                                                              setState(() {
+                                                               tags.removeAt(index); 
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              new Positioned(
+                                top: 20,
+                                right: 5,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.add_circle_outline,
+                                    color: Colors.orange,
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            content: TextField(
+                                              controller: _tagController,
+                                              decoration: InputDecoration(
+                                                  hintText: "Enter a Tag",
+                                                  border: UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Colors.orange))),
+                                              cursorColor: Colors.orange,
+                                            ),
+                                            actions: <Widget>[
+                                              new FlatButton(
+                                                  child: new Text(
+                                                    "Add",
+                                                    style: TextStyle(
+                                                        color: Colors.orange),
+                                                  ),
+                                                  onPressed: _addTag),
+                                              new FlatButton(
+                                                child: new Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                      color: Colors.orange),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ),
+                              )
+                            ],
                           ),
                         ),
                         Container(
@@ -453,70 +546,77 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                             ),
                           )),
                       Container(
-                        margin: EdgeInsets.only(top: 25, left: 15, right: 15),
-                        child: Column(
-                          children: <Widget>[
-                            _image == null
-                            ? Container(
-                                height: 0,
-                                width: 0,
-                              )
-                            : Container(child: Stack(
-                              children: <Widget>[
-                                new Positioned(                              
-                                  child: Image.file(_image),
-                                ),
-                                new Positioned(
-                                  right: 0,
-                                  child: IconButton(
-                                  icon: Icon(Icons.cancel,color: Colors.orange,),
-                                  onPressed: (){
-                                    setState(() {
-                                      _image = null;
-                                    });
-                                  },
-                                ),
-                                ),
-                              ],
-                            )),
-                            Padding(
-                              padding: EdgeInsets.only(top: 25),
-                            ),
-                             url == null
-                            ? Container(
-                                height: 0,
-                                width: 0,
-                              )
-                            : Container(child: Stack(
-                              children: <Widget>[
-                                new Positioned(                              
-                                  child: Container(
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(25.0)
-                                    ),
-                                      border: Border.all(color: Colors.orangeAccent)
-                                    ),
-                                    child: Center(child: Text(url)),
-                                  ),
-                                ),
-                                new Positioned(
-                                  right: 0,
-                                  child: IconButton(
-                                  icon: Icon(Icons.cancel,color: Colors.orange,),
-                                  onPressed: (){
-                                    setState(() {
-                                      url = null;
-                                    });
-                                  },
-                                ),
-                                ),
-                              ],
-                            )),
-                          ],
-                        )
-                      ),
+                          margin: EdgeInsets.only(top: 25, left: 15, right: 15),
+                          child: Column(
+                            children: <Widget>[
+                              _image == null
+                                  ? Container(
+                                      height: 0,
+                                      width: 0,
+                                    )
+                                  : Container(
+                                      child: Stack(
+                                      children: <Widget>[
+                                        new Positioned(
+                                          child: Image.file(_image),
+                                        ),
+                                        new Positioned(
+                                          right: 0,
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.cancel,
+                                              color: Colors.orange,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _image = null;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              Padding(
+                                padding: EdgeInsets.only(top: 25),
+                              ),
+                              url == null
+                                  ? Container(
+                                      height: 0,
+                                      width: 0,
+                                    )
+                                  : Container(
+                                      child: Stack(
+                                      children: <Widget>[
+                                        new Positioned(
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(25.0)),
+                                                border: Border.all(
+                                                    color:
+                                                        Colors.orangeAccent)),
+                                            child: Center(child: Text(url)),
+                                          ),
+                                        ),
+                                        new Positioned(
+                                          right: 0,
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.cancel,
+                                              color: Colors.orange,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                url = null;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                            ],
+                          )),
                       Container(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -623,7 +723,8 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                     minWidth: double.maxFinite,
                     height: 44,
                     child: RaisedButton(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)) ,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(22)),
                         color: Colors.orange,
                         child: Text(
                           "Submit",
