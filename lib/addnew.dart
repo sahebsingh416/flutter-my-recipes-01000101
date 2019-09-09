@@ -61,6 +61,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   void _addTag() {
     setState(() {
       tags.add(_tagController.text);
+      _tagController.clear();
     });
     print(tags);
   }
@@ -68,9 +69,9 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   void _addRecipe() {
     print(url);
     Navigator.pop(context);
-    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-    //             return Tabbar();
-    //           }));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
+                return Tabbar();
+              }));
   }
 
   void _checkFields() {
@@ -100,6 +101,8 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       "preparationTime": _recipeDurationController.text + " Min",
       "serves": _recipeServesController.text,
       "complexity": _dropDownComplexity,
+      "metaTags": tags,
+      "ytUrl": url
     });
     var statusCode = req.statusCode;
     print(statusCode);
@@ -202,7 +205,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                       child: Stack(
                                         children: <Widget>[
                                           new Positioned(
-                                            child: Container(
+                                            child: tags.length == 0 ? Container(child: Text("Tags*", style: TextStyle(color: Colors.blueGrey),),margin: EdgeInsets.only(top: 18),) : Container(
                                               margin:
                                                   EdgeInsets.only(right: 50),
                                               child: ListView.builder(
@@ -270,6 +273,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
+                                            title: Text('Add Tags'),
                                             content: TextField(
                                               controller: _tagController,
                                               decoration: InputDecoration(

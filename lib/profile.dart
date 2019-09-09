@@ -43,9 +43,9 @@ class _ProfileState extends State<Profile> {
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
-          leading: FlatButton(
+          actions : <Widget>[FlatButton(
             child: Icon(
-              Icons.exit_to_app,
+              Icons.exit_to_app ,
               size: 25,
             ),
             onPressed: () {
@@ -57,7 +57,7 @@ class _ProfileState extends State<Profile> {
                 return Login();
               }));
             },
-          ),
+          )] ,
           backgroundColor: Colors.white,
           title: Text(
             "Profile",

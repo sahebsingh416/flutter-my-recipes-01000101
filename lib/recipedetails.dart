@@ -27,6 +27,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   final store = LocalStorage('recipes');
   VideoPlayerController _videoController;
   bool _isPlaying = false;
+  bool _hasVideo = true;
 
   @override
   void initState() {
@@ -46,7 +47,6 @@ class _RecipeDetailsState extends State<RecipeDetails> {
 //      });
 //    });
     currentRecipeId = store.getItem('currentID');
-    print(currentRecipeId);
     ingredients = store.getItem('ingredientsJSON');
     recipes = store.getItem('recipeJSON');
     for (int i = 0; i < recipes.length; i++) {
@@ -57,6 +57,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
             Icons.favorite,
             color: Colors.red,
           );
+          if (recipes[i]["ytUrl"] == null){
+            _hasVideo = true;
+          }
         } else {
           _favIcon = Icon(
             Icons.favorite_border,
@@ -195,7 +198,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               progressBarBackgroundColor: Colors.pink,
                               seekBarPlayedColor: Colors.white),
                           source:
-                              "loLfq8JvNAo",
+                          recipes[recipeIndex]["ytUrl"],
                           quality: YoutubeQuality.MEDIUM,
                           autoPlay: true,
                           keepScreenOn: true,
@@ -207,7 +210,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                           },
                         ),
                       ),
-                _isPlaying == false
+                _hasVideo && _isPlaying == false
                     ? new Positioned(
                         top: 100,
                         child: Center(
