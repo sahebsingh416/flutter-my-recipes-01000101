@@ -63,8 +63,11 @@ class _WishListState extends State<WishList> {
     });
   }
 
-  void _getRecipes() async {
+  Future _getRecipes() async {
     final token = store2.getItem('userToken');
+    final _ = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/feeds",
+        headers: {HttpHeaders.authorizationHeader: token});
     final res1 = await http.get(
         "http://35.160.197.175:3006/api/v1/recipe/cooking-list",
         headers: {HttpHeaders.authorizationHeader: token});

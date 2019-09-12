@@ -31,7 +31,7 @@ dependencies:
   youtube_player: ^3.5.0
   share: ^0.6.2+1
   speech_recognition: ^0.3.0+1
-  # speech_recognition: "^0.3.0"
+  
 
 dev_dependencies:
   flutter_test:
