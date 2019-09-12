@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:speech_recognition/speech_recognition.dart';
+import 'package:permission/permission.dart';
 
 // import 'package:speech_recognition/speech_recognition.dart';
 
@@ -95,6 +96,16 @@ class _RecipeState extends State<Recipe> {
     _speechRecognition.activate().then(
           (result) => setState(() => _isAvailable = result),
         );
+  }
+
+   Future microphonePermission() async{
+    var permissions = await Permission.getPermissionsStatus(
+      [PermissionName.Microphone]);
+    if(permissions != PermissionStatus.allow) {
+      Permission.requestPermissions([PermissionName.Microphone]);
+    } else {
+
+    }
   }
 
   void _getRecipes() async {
@@ -209,7 +220,9 @@ class _RecipeState extends State<Recipe> {
                 color: Colors.orange,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 child: Icon(Icons.keyboard_voice,color: Colors.white,),
-                onPressed: (){},
+                onPressed: (){
+                  microphonePermission();
+                },
               ) : IconButton(
                   icon: Icon(Icons.keyboard_voice),
                   onPressed: () {

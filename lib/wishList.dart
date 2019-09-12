@@ -59,7 +59,7 @@ class _WishListState extends State<WishList> {
     setState(() {
       _getRecipes();
       // wishList = store.getItem('wishlistJSON');
-      _searchedRecipes();
+      //_searchedRecipes();
     });
   }
 
@@ -162,7 +162,7 @@ class _WishListState extends State<WishList> {
           //   ),
           // ],
         ),
-        body: _isSearched == false
+        body: _isSearched == false || _apiCalled == false
             ? (_noResultsFound == false
                 ? Container(
                     child: Center(
