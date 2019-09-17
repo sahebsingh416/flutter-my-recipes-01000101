@@ -26,7 +26,6 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   var url;
   final _formkey = GlobalKey<FormState>();
   bool _autoValidate = false;
-  String _dropDownType;
   String _dropDownComplexity;
   bool _isValid = false;
   File _image;
@@ -90,8 +89,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     }
   }
 
-  void _submitRecipe() async {
-    print(_dropDownComplexity);
+  Future<void> _addDetails() async {
     final token = store.getItem('userToken');
     final req = await http
         .post("http://35.160.197.175:3006/api/v1/recipe/add", headers: {
@@ -101,19 +99,16 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       "preparationTime": _recipeDurationController.text + " Min",
       "serves": _recipeServesController.text,
       "complexity": _dropDownComplexity,
-      "metaTags": tags,
       "ytUrl": url
     });
-    var statusCode = req.statusCode;
-    print(statusCode);
+    print(req.statusCode);
     var addResponse = jsonDecode(req.body);
     print(addResponse);
-    // final res1 = await http.get(
-    //     "http://35.160.197.175:3006/api/v1/recipe/feeds",
-    //     headers: {HttpHeaders.authorizationHeader: token});
-    // var jsonResponse = jsonDecode(res1.body);
-    // print(jsonResponse);
-    // store.setItem('recipeJSON', jsonResponse);
+    _addRecipe();
+  }
+
+  Future<void> _addPhoto() async {
+    final token = store.getItem('userToken');
     final req1 = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo",
         headers: {
@@ -121,9 +116,22 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
         },
         body: {
           "photo": base64Encode(_image.readAsBytesSync()),
-          "recipeId": addResponse["id"].toString(),
+          //"recipeId": addResponse["id"].toString(),
         });
     print(req1.statusCode);
+    
+  }
+
+  void _submitRecipe() async {
+    // print(_dropDownComplexity);
+    // final res1 = await http.get(
+    //     "http://35.160.197.175:3006/api/v1/recipe/feeds",
+    //     headers: {HttpHeaders.authorizationHeader: token});
+    // var jsonResponse = jsonDecode(res1.body);
+    // print(jsonResponse);
+    // store.setItem('recipeJSON', jsonResponse);
+    _addDetails();
+      _addPhoto();
     _addRecipe();
   }
 
@@ -737,7 +745,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                         onPressed: () {
                           _checkFields();
                           if (_isValid) {
-                            _submitRecipe();
+                            _addDetails();
                           }
                         }),
                   ),

@@ -22,6 +22,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   var recipes;
   bool videoUrl = true;
   Icon _favIcon;
+  bool _hasInstructions = false;
   final defaultImage =
       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
   final store = LocalStorage('recipes');
@@ -32,47 +33,62 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   @override
   void initState() {
     super.initState();
-//    _controller = VideoPlayerController.network("https://www.youtube.com/watch?v=-liJSfU5yBk");
-//    _controller.addListener((){
-//      final bool isPlaying = _controller.value.isPlaying;
-//      if(isPlaying != _isPlaying){
-//        setState(() {
-//          _isPlaying = isPlaying;
-//        });
-//      }
-//    });
-//    _controller.initialize().then((_){
-//      setState(() {
-//
-//      });
-//    });
-    currentRecipeId = store.getItem('currentID');
-    ingredients = store.getItem('ingredientsJSON');
-    recipes = store.getItem('recipeJSON');
-    for (int i = 0; i < recipes.length; i++) {
-      if (currentRecipeId == recipes[i]["recipeId"]) {
-        recipeIndex = i;
-        if (recipes[i]["inCookingList"] == 1) {
-          _favIcon = Icon(
-            Icons.favorite,
-            color: Colors.red,
-          );
-          if (recipes[i]["ytUrl"] == null){
-            _hasVideo = true;
+    setState(() {
+      currentRecipeId = store.getItem('currentID');
+      // ingredients = store.getItem('ingredientsJSON');
+      recipes = store.getItem('recipeJSON');
+      for (int i = 0; i < recipes.length; i++) {
+        if (currentRecipeId == recipes[i]["recipeId"]) {
+          recipeIndex = i;
+          if (recipes[i]["inCookingList"] == 1) {
+            _favIcon = Icon(
+              Icons.favorite,
+              color: Colors.red,
+            );
+          } else {
+            _favIcon = Icon(
+              Icons.favorite_border,
+              color: Colors.white,
+            );
           }
-        } else {
-          _favIcon = Icon(
-            Icons.favorite_border,
-            color: Colors.white,
-          );
         }
       }
-    }
-    instructions = store.getItem('instructionsJSON');
+      if (recipes[recipeIndex]["ytUrl"] == null) {
+        _hasVideo = false;
+      }
+    });
+    _getIngredients();
+    _getInstructions();
   }
 
   void _backToRecipes() {
     Navigator.pop(context);
+  }
+
+  Future<void> _getIngredients() async {
+    final token = store.getItem('userToken');
+    final res1 = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
+        headers: {HttpHeaders.authorizationHeader: token});
+    final jsonResponse = jsonDecode(res1.body);
+    setState(() {
+      store.setItem('ingredientsJSON', jsonResponse);
+      if (currentRecipeId == jsonResponse["id"]) {
+        ingredients = jsonResponse["ingredient"];
+      }
+      print(ingredients);
+    });
+  }
+
+  Future<void> _getInstructions() async {
+    final token = store.getItem('userToken');
+    final res1 = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/${recipeIndex}/instructions",
+        headers: {HttpHeaders.authorizationHeader: token});
+    final jsonResponse = jsonDecode(res1.body);
+    instructions = jsonResponse;
+    _hasInstructions = instructions[currentRecipeId] != null ? true : false;
+    print(instructions);
   }
 
   void _addToFavorite() {
@@ -197,8 +213,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               playPauseColor: Colors.red,
                               progressBarBackgroundColor: Colors.pink,
                               seekBarPlayedColor: Colors.white),
-                          source:
-                          recipes[recipeIndex]["ytUrl"],
+                          source: recipes[recipeIndex]["ytUrl"],
                           quality: YoutubeQuality.MEDIUM,
                           autoPlay: true,
                           keepScreenOn: true,
@@ -245,10 +260,13 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                         top: 10,
                         left: 10,
                         child: IconButton(
-                          icon: Icon(Icons.cancel,color: Colors.white,),
+                          icon: Icon(
+                            Icons.cancel,
+                            color: Colors.white,
+                          ),
                           onPressed: () {
                             setState(() {
-                             _isPlaying = false; 
+                              _isPlaying = false;
                             });
                           },
                         ),
@@ -421,36 +439,38 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  ListView(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: <Widget>[
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            contentPadding: EdgeInsets.all(5),
-                            leading: CircleAvatar(
-                              child: Text(
-                                "${index + 1}",
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.white),
-                              ),
-                              backgroundColor: Colors.orange,
-                              radius: 10.0,
+                  _hasInstructions
+                      ? ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: <Widget>[
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: instructions.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return ListTile(
+                                  contentPadding: EdgeInsets.all(5),
+                                  leading: CircleAvatar(
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors.orange,
+                                    radius: 10.0,
+                                  ),
+                                  title: Text(
+                                    instructions[recipeIndex]["instruction"],
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                );
+                              },
                             ),
-                            title: Text(
-                              "Saute onions till it become translucent",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  )
+                          ],
+                        )
+                      : Text(""),
                 ],
               ),
             )

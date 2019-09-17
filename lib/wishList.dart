@@ -166,7 +166,11 @@ class _WishListState extends State<WishList> {
             ? (_noResultsFound == false
                 ? Container(
                     child: Center(
-                      child: CircularProgressIndicator(),
+                      child: Container(
+                                  height: 80,
+                                  width: 80,
+                                  child: Image.asset(
+                                      "images/Pacman.gif")),
                     ),
                   )
                 : Container(
