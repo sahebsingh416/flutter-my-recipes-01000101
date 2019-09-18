@@ -16,15 +16,15 @@ class RecipeDetails extends StatefulWidget {
 
 class _RecipeDetailsState extends State<RecipeDetails> {
   var recipeIndex;
+  bool _apiCalled = false;
   var currentRecipeId;
   var ingredients;
   var instructions;
   var recipes;
   bool videoUrl = true;
   Icon _favIcon;
-  bool _hasInstructions = false;
   final defaultImage =
-      "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
+      "https://cdn.dribbble.com/users/1012566/screenshots/4187820/topic-2.jpg";
   final store = LocalStorage('recipes');
   VideoPlayerController _videoController;
   bool _isPlaying = false;
@@ -33,62 +33,54 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   @override
   void initState() {
     super.initState();
+//    _controller = VideoPlayerController.network("https://www.youtube.com/watch?v=-liJSfU5yBk");
+//    _controller.addListener((){
+//      final bool isPlaying = _controller.value.isPlaying;
+//      if(isPlaying != _isPlaying){
+//        setState(() {
+//          _isPlaying = isPlaying;
+//        });
+//      }
+//    });
+//    _controller.initialize().then((_){
+//      setState(() {
+//
+//      });
+//    });
+    currentRecipeId = store.getItem('currentID');
+    recipeIndex = currentRecipeId;
+    _recipeDetails();
+  }
+
+  Future<void> _recipeDetails() async {
+    final token = store.getItem('userToken');
+    final req = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/${currentRecipeId}/details",
+        headers: {HttpHeaders.authorizationHeader: token});
     setState(() {
-      currentRecipeId = store.getItem('currentID');
-      // ingredients = store.getItem('ingredientsJSON');
-      recipes = store.getItem('recipeJSON');
-      for (int i = 0; i < recipes.length; i++) {
-        if (currentRecipeId == recipes[i]["recipeId"]) {
-          recipeIndex = i;
-          if (recipes[i]["inCookingList"] == 1) {
-            _favIcon = Icon(
-              Icons.favorite,
-              color: Colors.red,
-            );
-          } else {
-            _favIcon = Icon(
-              Icons.favorite_border,
-              color: Colors.white,
-            );
-          }
-        }
+      recipes = jsonDecode(req.body);
+      if (recipes["inCookingList"] == 1) {
+        _favIcon = Icon(
+          Icons.favorite,
+          color: Colors.red,
+        );
+      } else {
+        _favIcon = Icon(
+          Icons.favorite_border,
+          color: Colors.white,
+        );
       }
-      if (recipes[recipeIndex]["ytUrl"] == null) {
+      if (recipes["ytUrl"] == null || recipes["ytUrl"] == "") {
         _hasVideo = false;
       }
+      ingredients = recipes["ingredients"];
+      instructions = recipes["instructions"];
+      _apiCalled = true;
     });
-    _getIngredients();
-    _getInstructions();
   }
 
   void _backToRecipes() {
     Navigator.pop(context);
-  }
-
-  Future<void> _getIngredients() async {
-    final token = store.getItem('userToken');
-    final res1 = await http.get(
-        "http://35.160.197.175:3006/api/v1/recipe/1/ingredients",
-        headers: {HttpHeaders.authorizationHeader: token});
-    final jsonResponse = jsonDecode(res1.body);
-    setState(() {
-      store.setItem('ingredientsJSON', jsonResponse);
-      if (currentRecipeId == jsonResponse["id"]) {
-        ingredients = jsonResponse["ingredient"];
-      }
-      print(ingredients);
-    });
-  }
-
-  Future<void> _getInstructions() async {
-    final token = store.getItem('userToken');
-    final res1 = await http.get(
-        "http://35.160.197.175:3006/api/v1/recipe/${recipeIndex}/instructions",
-        headers: {HttpHeaders.authorizationHeader: token});
-    final jsonResponse = jsonDecode(res1.body);
-    instructions = jsonResponse;
-    _hasInstructions = instructions[currentRecipeId] != null ? true : false;
-    print(instructions);
   }
 
   void _addToFavorite() {
@@ -134,13 +126,8 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     final token = store.getItem('userToken');
     final req = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list",
-        headers: {
-          HttpHeaders.authorizationHeader:
-              "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s"
-        },
-        body: {
-          "recipeId": currentRecipeId.toString()
-        });
+        headers: {HttpHeaders.authorizationHeader: token},
+        body: {"recipeId": currentRecipeId.toString()});
     print(req.statusCode);
     setState(() {
       _favIcon = Icon(
@@ -180,7 +167,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           ),
           backgroundColor: Colors.white,
         ),
-        body: ListView(
+        body: _apiCalled ? ListView(
           shrinkWrap: true,
           children: <Widget>[
             Stack(
@@ -190,9 +177,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                     ? CachedNetworkImage(
                         height: 250,
                         width: double.maxFinite,
-                        imageUrl: recipes[recipeIndex]["photo"] == null
+                        imageUrl: recipes["photo"] == null
                             ? defaultImage
-                            : recipes[recipeIndex]["photo"],
+                            : recipes["photo"],
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Center(
                           child: Container(
@@ -213,8 +200,8 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               playPauseColor: Colors.red,
                               progressBarBackgroundColor: Colors.pink,
                               seekBarPlayedColor: Colors.white),
-                          source: recipes[recipeIndex]["ytUrl"],
-                          quality: YoutubeQuality.MEDIUM,
+                          source: recipes["ytUrl"],
+                          quality: YoutubeQuality.LOWEST,
                           autoPlay: true,
                           keepScreenOn: true,
                           // callbackController is (optional).
@@ -225,7 +212,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                           },
                         ),
                       ),
-                _hasVideo && _isPlaying == false
+                      _hasVideo && _isPlaying == false
                     ? new Positioned(
                         top: 100,
                         child: Center(
@@ -256,6 +243,39 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                           },
                         ),
                       )
+                // _hasVideo
+                //     ? (_isPlaying == false
+                //         ? new Positioned(
+                //             top: 100,
+                //             child: Center(
+                //               child: IconButton(
+                //                 icon: Image.asset('images/youtube.png'),
+                //                 iconSize: 50,
+                //                 onPressed: () {
+                //                   setState(() {
+                //                     _isPlaying = true;
+                //                   });
+                //                 },
+                //               ),
+                //             ),
+                //           )
+                //         : Text(""))
+                //     : Text(""),
+                // _isPlaying == false
+                //     ? new Positioned(
+                //         top: 10,
+                //         right: 10,
+                //         child: IconButton(
+                //           icon: _favIcon,
+                //           onPressed: () {
+                //             if (_favIcon.icon == Icons.favorite) {
+                //               _removedFromFavorite();
+                //             } else {
+                //               _addToFavorite();
+                //             }
+                //           },
+                //         ),
+                //       )
                     : new Positioned(
                         top: 10,
                         left: 10,
@@ -287,7 +307,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     child: Text(
-                      recipes[recipeIndex]["name"],
+                      recipes["name"],
                       textAlign: TextAlign.left,
                       style: TextStyle(fontSize: 17),
                     ),
@@ -313,7 +333,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     padding: EdgeInsets.only(right: 5),
                                   ),
                                   Text(
-                                    recipes[recipeIndex]["preparationTime"],
+                                    recipes["preparationTime"],
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 14,
@@ -339,7 +359,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     padding: EdgeInsets.only(right: 5),
                                   ),
                                   Text(
-                                    recipes[recipeIndex]["complexity"],
+                                    recipes["complexity"],
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 14,
@@ -364,7 +384,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                 padding: EdgeInsets.only(right: 5),
                               ),
                               Text(
-                                recipes[recipeIndex]["serves"],
+                                recipes["serves"],
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                   fontSize: 14,
@@ -404,7 +424,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: 1,
+                        itemCount: ingredients.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
                             contentPadding: EdgeInsets.all(5),
@@ -413,7 +433,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               color: Colors.orange,
                             ),
                             title: Text(
-                              "2 Spring Onions",
+                              ingredients[index]["ingredient"],
                               textAlign: TextAlign.left,
                               style: TextStyle(fontSize: 18),
                             ),
@@ -439,43 +459,41 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  _hasInstructions
-                      ? ListView(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          children: <Widget>[
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: instructions.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  contentPadding: EdgeInsets.all(5),
-                                  leading: CircleAvatar(
-                                    child: Text(
-                                      "${index + 1}",
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                    ),
-                                    backgroundColor: Colors.orange,
-                                    radius: 10.0,
-                                  ),
-                                  title: Text(
-                                    instructions[recipeIndex]["instruction"],
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                );
-                              },
+                  ListView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: <Widget>[
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: instructions.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            contentPadding: EdgeInsets.all(5),
+                            leading: CircleAvatar(
+                              child: Text(
+                                "${index + 1}",
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.white),
+                              ),
+                              backgroundColor: Colors.orange,
+                              radius: 10.0,
                             ),
-                          ],
-                        )
-                      : Text(""),
+                            title: Text(
+                              instructions[index]["instruction"],
+                              textAlign: TextAlign.left,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  )
                 ],
               ),
             )
           ],
-        ),
+        ) : Container(child: Center(child: CircularProgressIndicator(),),),
       ),
     );
   }

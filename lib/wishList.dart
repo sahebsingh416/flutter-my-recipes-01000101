@@ -13,7 +13,7 @@ void main() {
 
 class WishList extends StatefulWidget {
   final defaultImage =
-      "https://upload.wikimedia.org/wikipedia/commons/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg";
+      "https://cdn.dribbble.com/users/1012566/screenshots/4187820/topic-2.jpg";
   @override
   _WishListState createState() => _WishListState();
 }
@@ -59,17 +59,17 @@ class _WishListState extends State<WishList> {
     setState(() {
       _getRecipes();
       // wishList = store.getItem('wishlistJSON');
-      //_searchedRecipes();
+      _searchedRecipes();
     });
   }
 
-  Future _getRecipes() async {
+  void _getRecipes() async {
     final token = store2.getItem('userToken');
-    final _ = await http.get(
-        "http://35.160.197.175:3006/api/v1/recipe/feeds",
-        headers: {HttpHeaders.authorizationHeader: token});
     final res1 = await http.get(
         "http://35.160.197.175:3006/api/v1/recipe/cooking-list",
+        headers: {HttpHeaders.authorizationHeader: token});
+        final res2 = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/feeds",
         headers: {HttpHeaders.authorizationHeader: token});
     final responseJSON = jsonDecode(res1.body);
     if (this.mounted) {
@@ -166,11 +166,7 @@ class _WishListState extends State<WishList> {
             ? (_noResultsFound == false
                 ? Container(
                     child: Center(
-                      child: Container(
-                                  height: 80,
-                                  width: 80,
-                                  child: Image.asset(
-                                      "images/Pacman.gif")),
+                      child: CircularProgressIndicator(),
                     ),
                   )
                 : Container(

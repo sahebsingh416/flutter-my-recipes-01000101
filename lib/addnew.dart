@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import './tabbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:localstorage/localstorage.dart';
-import 'dart:async';
-import 'dart:io';
 import './showdialog.dart';
-import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddNewRecipe extends StatefulWidget {
   @override
@@ -26,6 +25,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   var url;
   final _formkey = GlobalKey<FormState>();
   bool _autoValidate = false;
+  String _dropDownType;
   String _dropDownComplexity;
   bool _isValid = false;
   File _image;
@@ -69,8 +69,8 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     print(url);
     Navigator.pop(context);
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) {
-                return Tabbar();
-              }));
+      return Tabbar();
+    }));
   }
 
   void _checkFields() {
@@ -89,7 +89,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     }
   }
 
-  Future<void> _addDetails() async {
+  void _submitRecipe() async {
     final token = store.getItem('userToken');
     final req = await http
         .post("http://35.160.197.175:3006/api/v1/recipe/add", headers: {
@@ -99,41 +99,70 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       "preparationTime": _recipeDurationController.text + " Min",
       "serves": _recipeServesController.text,
       "complexity": _dropDownComplexity,
+      //"metaTags": tags.toString(),
       "ytUrl": url
     });
-    print(req.statusCode);
+
     var addResponse = jsonDecode(req.body);
     print(addResponse);
-    _addRecipe();
+    /*final res1 = await http.get(
+        "http://35.160.197.175:3006/api/v1/recipe/feeds",
+        headers: {HttpHeaders.authorizationHeader: token});
+    var jsonResponse = jsonDecode(res1.body);
+    store.setItem('recipeJSON', jsonResponse);*/
+    _addIngredents(addResponse["id"].toString());
+  }
+  _addIngredents(String id) async {  
+    final token = store.getItem('userToken');
+    for (var ingredient in _recipeIngredients){
+       final req = await http
+        .post("http://35.160.197.175:3006/api/v1/recipe/add-ingredient", headers: {
+      HttpHeaders.authorizationHeader: token
+    }, body: {
+      "ingredient": ingredient.toString(),
+      "recipeId": id,
+      });
+    }
+    _addInstructions(id.toString());
   }
 
-  Future<void> _addPhoto() async {
+  _addInstructions(String id) async {  
     final token = store.getItem('userToken');
+    for (var instruction in _instructionSteps){
+       final req = await http
+        .post("http://35.160.197.175:3006/api/v1/recipe/add-instruction", headers: {
+      HttpHeaders.authorizationHeader: token
+    }, body: {
+      "instruction": instruction.toString(),
+      "recipeId": id,
+      });
+    }
+    _addRecipe();
+  }
+  /*_uploadImage(String id) async {
+    final token = store.getItem('userToken');
+    /*var base64Image = base64Encode(_image.readAsBytesSync());
     final req1 = await http.post(
         "http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo",
-        headers: {
-          HttpHeaders.authorizationHeader: token
-        },
-        body: {
-          "photo": base64Encode(_image.readAsBytesSync()),
-          //"recipeId": addResponse["id"].toString(),
-        });
-    print(req1.statusCode);
-    
-  }
-
-  void _submitRecipe() async {
-    // print(_dropDownComplexity);
-    // final res1 = await http.get(
-    //     "http://35.160.197.175:3006/api/v1/recipe/feeds",
-    //     headers: {HttpHeaders.authorizationHeader: token});
-    // var jsonResponse = jsonDecode(res1.body);
-    // print(jsonResponse);
-    // store.setItem('recipeJSON', jsonResponse);
-    _addDetails();
-      _addPhoto();
+        headers: {HttpHeaders.authorizationHeader: token},
+        body: {"photo": base64Image, "recipeId": id});
+    print(req1.statusCode);*/
+    var stream =
+        new http.ByteStream(DelegatingStream.typed(_image.openRead()));
+    var length = await _image.length();
+    var uri = Uri.parse("http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo");
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile("photo", stream , length);
+    request.headers[HttpHeaders.authorizationHeader] = token;
+    request.files.add(multipartFile);
+    request.fields["recipeId"] = id;
+    var response = await request.send();
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
     _addRecipe();
-  }
+  }*/
 
   Future _getImageFromGallery() async {
     File picture = await ImagePicker.pickImage(
@@ -213,54 +242,79 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                                       child: Stack(
                                         children: <Widget>[
                                           new Positioned(
-                                            child: tags.length == 0 ? Container(child: Text("Tags*", style: TextStyle(color: Colors.blueGrey),),margin: EdgeInsets.only(top: 18),) : Container(
-                                              margin:
-                                                  EdgeInsets.only(right: 50),
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: tags.length,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemBuilder:
-                                                    (BuildContext context,
-                                                        int index) {
-                                                  return Container(
-                                                    margin: EdgeInsets.only(left: 5,top: 5,bottom: 8),
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(),
-                                                        borderRadius: BorderRadius.all(Radius.circular(30))
-                                                        ),
-                                                    alignment:
-                                                        Alignment(0.0, -1.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          margin: EdgeInsets.only(left:10),
-                                                            child: Text(
-                                                                tags[index])),
-                                                        Container(
-                                                          child: IconButton(
-                                                            icon: Icon(
-                                                              Icons.close,
-                                                              color:
-                                                                  Colors.orange,
-                                                            ),
-                                                            onPressed: (){
-                                                              setState(() {
-                                                               tags.removeAt(index); 
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
+                                            child: tags.length == 0
+                                                ? Container(
+                                                    child: Text(
+                                                      "Tags*",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.blueGrey),
                                                     ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
+                                                    margin: EdgeInsets.only(
+                                                        top: 18),
+                                                  )
+                                                : Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 50),
+                                                    child: ListView.builder(
+                                                      shrinkWrap: true,
+                                                      itemCount: tags.length,
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemBuilder:
+                                                          (BuildContext context,
+                                                              int index) {
+                                                        return Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  left: 5,
+                                                                  top: 5,
+                                                                  bottom: 8),
+                                                          decoration: BoxDecoration(
+                                                              border:
+                                                                  Border.all(),
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          30))),
+                                                          alignment: Alignment(
+                                                              0.0, -1.0),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: <Widget>[
+                                                              Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          left:
+                                                                              10),
+                                                                  child: Text(tags[
+                                                                      index])),
+                                                              Container(
+                                                                child:
+                                                                    IconButton(
+                                                                  icon: Icon(
+                                                                    Icons.close,
+                                                                    color: Colors
+                                                                        .orange,
+                                                                  ),
+                                                                  onPressed:
+                                                                      () {
+                                                                    setState(
+                                                                        () {
+                                                                      tags.removeAt(
+                                                                          index);
+                                                                    });
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
                                           ),
                                         ],
                                       ),
@@ -745,7 +799,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
                         onPressed: () {
                           _checkFields();
                           if (_isValid) {
-                            _addDetails();
+                            _submitRecipe();
                           }
                         }),
                   ),
