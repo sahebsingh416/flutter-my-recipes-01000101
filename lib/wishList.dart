@@ -201,7 +201,7 @@ class _WishListState extends State<WishList> {
                                     ),
                                   ),
                                 ),
-                                Container(
+                                /*Container(
                                   alignment: Alignment(-0.8, 0.0),
                                   margin: EdgeInsets.only(top: 10),
                                   child: _apiCalled == false
@@ -211,7 +211,7 @@ class _WishListState extends State<WishList> {
                                           textAlign: TextAlign.left,
                                           style: TextStyle(color: Colors.grey),
                                         ),
-                                ),
+                                ),*/
                                 Container(
                                   alignment: Alignment(-0.9, 0.0),
                                   margin: EdgeInsets.only(top: 10),

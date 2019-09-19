@@ -296,14 +296,14 @@ class _RecipeDetailsState extends State<RecipeDetails> {
             Card(
               child: Column(
                 children: <Widget>[
-                  Container(
+                  /*Container(
                     margin: EdgeInsets.only(top: 10),
                     child: Text(
                       "Soup",
                       textAlign: TextAlign.left,
                       style: TextStyle(color: Colors.grey),
                     ),
-                  ),
+                  ),*/
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     child: Text(

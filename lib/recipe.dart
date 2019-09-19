@@ -268,7 +268,7 @@ class _RecipeState extends State<Recipe> {
                                     ),
                                   ),
                                 ),
-                                Container(
+                                /*Container(
                                   alignment: Alignment(-0.8, 0.0),
                                   margin: EdgeInsets.only(top: 10),
                                   child: _apiCalled == false
@@ -278,7 +278,7 @@ class _RecipeState extends State<Recipe> {
                                           textAlign: TextAlign.left,
                                           style: TextStyle(color: Colors.grey),
                                         ),
-                                ),
+                                ),*/
                                 Container(
                                   alignment: Alignment(-0.9, 0.0),
                                   margin: EdgeInsets.only(top: 10),

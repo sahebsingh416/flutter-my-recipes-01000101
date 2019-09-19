@@ -31,7 +31,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
   File _image;
   List _recipeIngredients = [];
   List _instructionSteps = [];
-  List<String> tags = [];
+  List tags = [];
 
   void _addIngredient() {
     setState(() {
@@ -99,7 +99,7 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
       "preparationTime": _recipeDurationController.text + " Min",
       "serves": _recipeServesController.text,
       "complexity": _dropDownComplexity,
-      //"metaTags": tags.toString(),
+      "metaTags": tags.toString(),
       "ytUrl": url
     });
 
@@ -112,30 +112,35 @@ class _AddNewRecipeState extends State<AddNewRecipe> {
     store.setItem('recipeJSON', jsonResponse);*/
     _addIngredents(addResponse["id"].toString());
   }
-  _addIngredents(String id) async {  
+
+  _addIngredents(String id) async {
     final token = store.getItem('userToken');
-    for (var ingredient in _recipeIngredients){
-       final req = await http
-        .post("http://35.160.197.175:3006/api/v1/recipe/add-ingredient", headers: {
-      HttpHeaders.authorizationHeader: token
-    }, body: {
-      "ingredient": ingredient.toString(),
-      "recipeId": id,
-      });
+    for (var ingredient in _recipeIngredients) {
+      final req = await http.post(
+          "http://35.160.197.175:3006/api/v1/recipe/add-ingredient",
+          headers: {
+            HttpHeaders.authorizationHeader: token
+          },
+          body: {
+            "ingredient": ingredient.toString(),
+            "recipeId": id,
+          });
     }
     _addInstructions(id.toString());
   }
 
-  _addInstructions(String id) async {  
+  _addInstructions(String id) async {
     final token = store.getItem('userToken');
-    for (var instruction in _instructionSteps){
-       final req = await http
-        .post("http://35.160.197.175:3006/api/v1/recipe/add-instruction", headers: {
-      HttpHeaders.authorizationHeader: token
-    }, body: {
-      "instruction": instruction.toString(),
-      "recipeId": id,
-      });
+    for (var instruction in _instructionSteps) {
+      final req = await http.post(
+          "http://35.160.197.175:3006/api/v1/recipe/add-instruction",
+          headers: {
+            HttpHeaders.authorizationHeader: token
+          },
+          body: {
+            "instruction": instruction.toString(),
+            "recipeId": id,
+          });
     }
     _addRecipe();
   }
